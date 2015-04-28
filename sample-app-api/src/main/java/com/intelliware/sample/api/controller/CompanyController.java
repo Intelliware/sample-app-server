@@ -37,7 +37,6 @@ public class CompanyController {
 		CompanyVO companyVO = new CompanyVO();
 		companyVO.setId(String.valueOf(company.getId()));
 		companyVO.setName(company.getName());
-		companyVO.setAddress(company.getAddress());
 		companyVO.setPhone(company.getPhone());
 		companyVO.setContact(contactVO);
 		
@@ -58,6 +57,8 @@ public class CompanyController {
 	@RequestMapping(value="/companies/{id}", produces="application/json;charset=UTF-8")
 	public CompanyVO getCompany(@PathVariable String id) {
 		Company company = dao.findOne(Long.valueOf(id));
-		return createCompanyVO(company);
+		CompanyVO companyVO = createCompanyVO(company);
+		companyVO.setAddress(company.getAddress());
+		return companyVO;
 	}
 }
