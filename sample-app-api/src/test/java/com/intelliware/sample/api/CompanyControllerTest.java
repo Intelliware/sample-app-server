@@ -54,6 +54,9 @@ public class CompanyControllerTest {
     public void setup() throws Exception {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
         
+        companyRepository.deleteAll();
+        contactRepository.deleteAll();
+        
         Contact contactA = new Contact();
         contactA.setEmail("karyn.porter@stelaecor.com");
         contactA.setFirstName("Karyn");
@@ -64,13 +67,13 @@ public class CompanyControllerTest {
         company.setName("Résumé");
         company.setPhone("+1 (828) 533-2655");
         company.setContact(contactA);
-        this.companyList.add(companyRepository.save(company));
+        companyList.add(companyRepository.save(company));
         
         company = new Company();
         company.setName("BOILICON");
         company.setPhone("+1 (893) 432-3827");
         company.setContact(contactA);
-        this.companyList.add(companyRepository.save(company));
+        companyList.add(companyRepository.save(company));
     }
     
     @Test
