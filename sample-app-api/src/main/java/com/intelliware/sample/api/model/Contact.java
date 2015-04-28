@@ -15,7 +15,7 @@ public class Contact {
 	private String firstName;
 	private String lastName;
 	
-	protected Contact(){}
+	public Contact(){}
 
 	public long getId() {
 		return id;

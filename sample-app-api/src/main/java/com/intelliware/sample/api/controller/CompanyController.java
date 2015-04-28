@@ -21,7 +21,7 @@ public class CompanyController {
 	@Autowired
 	private CompanyRepository dao;
 	
-	@RequestMapping(value="/companies", produces="application/json")
+	@RequestMapping(value="/companies", produces="application/json;charset=UTF-8")
 	public PageableListVO<CompanyVO> getCompanies() {
 		Iterable<Company> companies = dao.findAll();
 		List<CompanyVO> companyVOList = new ArrayList<CompanyVO>();
@@ -37,6 +37,7 @@ public class CompanyController {
 			contactVO.setEmail(contact.getEmail());
 			
 			CompanyVO companyVO = new CompanyVO();
+			companyVO.setId(String.valueOf(company.getId()));
 			companyVO.setName(company.getName());
 			companyVO.setPhone(company.getPhone());
 			companyVO.setContact(contactVO);

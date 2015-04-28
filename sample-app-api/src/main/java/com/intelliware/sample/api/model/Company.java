@@ -22,8 +22,7 @@ public class Company {
 	@JoinColumn(name="contact_id")
 	private Contact contact;
 
-	protected Company() {
-	}
+	public Company() {}
 	
 	public Contact getContact() {
 		return contact;
