@@ -123,6 +123,12 @@ public class CompanyControllerTest {
         		  .andExpect(jsonPath("$.contact.name.first", is(companyContact.getFirstName())))
         		  .andExpect(jsonPath("$.contact.name.last", is(companyContact.getLastName())));
     }
+    
+    @Test
+    public void testGetCompanyNotFound() throws Exception {
+        mockMvc.perform(get("/companies/10000"))
+                .andExpect(status().is(404));
+    }
 
 
 }
