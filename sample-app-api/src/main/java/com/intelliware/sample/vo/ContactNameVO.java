@@ -1,15 +1,12 @@
-package com.intelliware.sample.api.model;
+package com.intelliware.sample.vo;
 
-public class CompanyContactName {
+public class ContactNameVO {
 
 	private String first;
 	private String last;
 
-	public CompanyContactName(String contactFirstName, String contactLastName) {
-		this.first = contactFirstName;
-		this.last = contactLastName;
-	}
-
+	public ContactNameVO(){}
+	
 	public String getFirst() {
 		return first;
 	}
