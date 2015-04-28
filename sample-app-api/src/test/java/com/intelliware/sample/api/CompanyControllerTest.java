@@ -66,11 +66,13 @@ public class CompanyControllerTest {
         Company company = new Company();
         company.setName("Résumé");
         company.setPhone("+1 (828) 533-2655");
+        company.setAddress("200 Adelaide W, Toronto, ON M5H 1W7");
         company.setContact(contactA);
         companyList.add(companyRepository.save(company));
         
         company = new Company();
         company.setName("BOILICON");
+        company.setAddress("80 Wellington Street, Ottawa, ON K1A 0A2");
         company.setPhone("+1 (893) 432-3827");
         company.setContact(contactA);
         companyList.add(companyRepository.save(company));
@@ -101,6 +103,25 @@ public class CompanyControllerTest {
 			      .andExpect(jsonPath("$.elements[1].contact.email", is(companyContact2.getEmail())))
 			      .andExpect(jsonPath("$.elements[1].contact.name.first", is(companyContact2.getFirstName())))
 				  .andExpect(jsonPath("$.elements[1].contact.name.last", is(companyContact2.getLastName())));
+    }
+    
+    @Test
+    public void testGetCompany() throws Exception {
+    	
+    	Company company = this.companyList.get(0);
+    	Contact companyContact = company.getContact();
+    	String companyId = String.valueOf(company.getId());
+    	
+        mockMvc.perform(get("/companies/" + companyId))
+                .andExpect(status().isOk())
+                  .andExpect(content().contentType(contentType))
+        		  .andExpect(jsonPath("$.id", is(companyId)))
+        		  .andExpect(jsonPath("$.name", is(company.getName())))
+        		  .andExpect(jsonPath("$.address", is(company.getAddress())))
+        		  .andExpect(jsonPath("$.phone", is(company.getPhone())))
+        		  .andExpect(jsonPath("$.contact.email", is(companyContact.getEmail())))
+        		  .andExpect(jsonPath("$.contact.name.first", is(companyContact.getFirstName())))
+        		  .andExpect(jsonPath("$.contact.name.last", is(companyContact.getLastName())));
     }
 
 

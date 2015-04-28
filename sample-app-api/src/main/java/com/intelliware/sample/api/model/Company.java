@@ -16,6 +16,7 @@ public class Company {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private long id;
 	private String name;
+	private String address;
 	private String phone;
 	
 	@ManyToOne
@@ -52,4 +53,13 @@ public class Company {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public String getAddress() {
+		return address;
+	}
+	
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
 }
