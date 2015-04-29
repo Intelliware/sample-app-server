@@ -4,72 +4,115 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.intelliware.sample.api.dao.CompanyRepository;
 import com.intelliware.sample.api.model.Company;
-import com.intelliware.sample.api.model.Contact;
 import com.intelliware.sample.vo.CompanyVO;
 import com.intelliware.sample.vo.ContactNameVO;
 import com.intelliware.sample.vo.ContactVO;
 import com.intelliware.sample.vo.PageableListVO;
 
+
 @RestController
 public class CompanyController {
 
 	@Autowired
-	private CompanyRepository dao;
+	private CompanyRepository companyDao;
 	
-	private CompanyVO createCompanyVO(Company company) {
-		
-		Contact contact = company.getContact();
-		
-		ContactNameVO contactNameVO = new ContactNameVO();
-		contactNameVO.setFirst(contact.getFirstName());
-		contactNameVO.setLast(contact.getLastName());
-		
-		ContactVO contactVO = new ContactVO();
-		contactVO.setName(contactNameVO);
-		contactVO.setEmail(contact.getEmail());
-		
+
+	private Company createCompany(CompanyVO inputCompany) {
+		ContactVO inputContact = inputCompany.getContact();
+		ContactNameVO inputContactName = inputContact.getName();
+		Company company = new Company();
+		company.setAddress(inputCompany.getAddress());
+		company.setPhone(inputCompany.getPhone());
+		company.setName(inputCompany.getName());
+		company.setContactEmail(inputContact.getEmail());
+		company.setContactFirstName(inputContactName.getFirst());
+		company.setContactLastName(inputContactName.getLast());
+		return company;
+	}
+	
+	private CompanyVO convertToCompanyVO(Company company) {	
+		ContactNameVO contactNameVO = createContactNameVO(company);
+		ContactVO contactVO = createContactVO(company, contactNameVO);
+		return createCompanyVO(company, contactVO);
+	}
+
+	private CompanyVO createCompanyVO(Company company, ContactVO contactVO) {
 		CompanyVO companyVO = new CompanyVO();
 		companyVO.setId(String.valueOf(company.getId()));
 		companyVO.setName(company.getName());
+		companyVO.setAddress(company.getAddress());
 		companyVO.setPhone(company.getPhone());
 		companyVO.setContact(contactVO);
-		
 		return companyVO;
 	}
+
+	private ContactVO createContactVO(Company company, ContactNameVO contactNameVO) {
+		ContactVO contactVO = new ContactVO();
+		contactVO.setName(contactNameVO);
+		contactVO.setEmail(company.getContactEmail());
+		return contactVO;
+	}
+
+	private ContactNameVO createContactNameVO(Company company) {
+		ContactNameVO contactNameVO = new ContactNameVO();
+		contactNameVO.setFirst(company.getContactFirstName());
+		contactNameVO.setLast(company.getContactLastName());
+		return contactNameVO;
+	}
+
 	
-	@RequestMapping(value="/companies", produces="application/json;charset=UTF-8")
+	@RequestMapping(value="/companies", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
 	public PageableListVO<CompanyVO> getCompanies() {
-		Iterable<Company> companies = dao.findAll();
+		Iterable<Company> companies = companyDao.findAll();
 		List<CompanyVO> companyVOList = new ArrayList<CompanyVO>();
 		for (Company company : companies){
-			companyVOList.add(createCompanyVO(company));
+			companyVOList.add(convertToCompanyVO(company));
 		}
 		return new PageableListVO<CompanyVO>(companyVOList);
 	}
 	
 
-	@RequestMapping(value="/companies/{id}", produces="application/json;charset=UTF-8")
+	@RequestMapping(value="/companies/{id}", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
 	public CompanyVO getCompany(@PathVariable String id) {
-
-		Company company = dao.findOne(Long.valueOf(id));
+		Company company = companyDao.findOne(Long.valueOf(id));
 		if (company == null){
 			throw new CompanyNotFoundException();
 		}
-		CompanyVO companyVO = createCompanyVO(company);
-		companyVO.setAddress(company.getAddress());
-		return companyVO;
+		return convertToCompanyVO(company);
 	}
 	
-	@ResponseStatus(value=HttpStatus.NOT_FOUND, reason="Company not found")
-    public class CompanyNotFoundException extends RuntimeException {
-		private static final long serialVersionUID = 6174765403031023779L;
-    }
+	@RequestMapping(value="/companies", method=RequestMethod.POST, consumes="application/json;charset=UTF-8")
+	public CompanyVO addCompany(@RequestBody CompanyVO inputCompany) {
+		Company company = createCompany(inputCompany);
+		companyDao.save(company);
+		return convertToCompanyVO(company);
+	}
+	
+//	@RequestMapping(value="/companies/{id}", method=RequestMethod.PUT, consumes="application/json;charset=UTF-8")
+//	public CompanyVO updateCompany(@PathVariable String id, @RequestBody CompanyVO inputCompany) {
+//		Company companyToUpdate = companyDao.findOne(Long.valueOf(id));
+//		Long contactId = companyToUpdate.getContact().getId();
+//		Contact contactToUpdate = contactDao.findOne(contactId);
+//		
+//		ContactVO inputContact = inputCompany.getContact();
+//		ContactNameVO inputcontactName = inputContact.getName();
+//		
+//		contactToUpdate.setEmail(inputContact.s);
+//		
+//		Contact contact = createContact(inputCompany);
+//		contactDao.save(contact);
+//		Company company = createCompany(inputCompany, contact);
+//		companyDao.save(company);
+//		return createCompanyVOWithAddress(company);
+//	}
+	
+
 }

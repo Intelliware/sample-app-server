@@ -6,8 +6,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 @Entity
 public class Company {
@@ -18,28 +16,11 @@ public class Company {
 	private String name;
 	private String address;
 	private String phone;
-	
-	@ManyToOne
-	@JoinColumn(name="contact_id")
-	private Contact contact;
+	private String contactEmail;
+	private String contactFirstName;
+	private String contactLastName;
 
 	public Company() {}
-	
-	public Contact getContact() {
-		return contact;
-	}
-
-	public void setContact(Contact contact) {
-		this.contact = contact;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
 
 	public long getId() {
 		return id;
@@ -60,6 +41,38 @@ public class Company {
 	
 	public void setAddress(String address) {
 		this.address = address;
+	}
+	
+	public String getContactEmail() {
+		return contactEmail;
+	}
+
+	public void setContactEmail(String contactEmail) {
+		this.contactEmail = contactEmail;
+	}
+
+	public String getContactFirstName() {
+		return contactFirstName;
+	}
+
+	public void setContactFirstName(String contactFirstName) {
+		this.contactFirstName = contactFirstName;
+	}
+
+	public String getContactLastName() {
+		return contactLastName;
+	}
+
+	public void setContactLastName(String contactLastName) {
+		this.contactLastName = contactLastName;
+	}
+	
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
 }

@@ -3,6 +3,7 @@ package com.intelliware.sample.api;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -23,15 +24,27 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intelliware.sample.api.dao.CompanyRepository;
-import com.intelliware.sample.api.dao.ContactRepository;
 import com.intelliware.sample.api.model.Company;
-import com.intelliware.sample.api.model.Contact;
+import com.intelliware.sample.vo.CompanyVO;
+import com.intelliware.sample.vo.ContactNameVO;
+import com.intelliware.sample.vo.ContactVO;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SampleAppApiApplication.class)
 @WebAppConfiguration
 public class CompanyControllerTest {
+	
+	public static String asJsonString(final Object obj) {
+	    try {
+	        final ObjectMapper mapper = new ObjectMapper();
+	        final String jsonContent = mapper.writeValueAsString(obj);
+	        return jsonContent;
+	    } catch (Exception e) {
+	        throw new RuntimeException(e);
+	    }
+	} 
 	
 	private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
@@ -45,9 +58,6 @@ public class CompanyControllerTest {
     private CompanyRepository companyRepository;
     
     @Autowired
-    private ContactRepository contactRepository;
-    
-    @Autowired
     private WebApplicationContext webApplicationContext;
     
     @Before
@@ -55,36 +65,54 @@ public class CompanyControllerTest {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
         
         companyRepository.deleteAll();
-        contactRepository.deleteAll();
-        
-        Contact contactA = new Contact();
-        contactA.setEmail("karyn.porter@stelaecor.com");
-        contactA.setFirstName("Karyn");
-        contactA.setLastName("Porter");
-        contactRepository.save(contactA);
         
         Company company = new Company();
         company.setName("Résumé");
         company.setPhone("+1 (828) 533-2655");
         company.setAddress("200 Adelaide W, Toronto, ON M5H 1W7");
-        company.setContact(contactA);
+        company.setContactEmail("karyn.porter@stelaecor.com");
+        company.setContactFirstName("Karyn");
+        company.setContactLastName("Porter");
         companyList.add(companyRepository.save(company));
         
         company = new Company();
         company.setName("BOILICON");
         company.setAddress("80 Wellington Street, Ottawa, ON K1A 0A2");
         company.setPhone("+1 (893) 432-3827");
-        company.setContact(contactA);
+        company.setContactEmail("mark.zuckerberg@stelaecor.com");
+        company.setContactFirstName("Mark");
+        company.setContactLastName("Zuckerberg");
         companyList.add(companyRepository.save(company));
     }
+    
+	private CompanyVO createMyCompanyVO() {
+		CompanyVO company = new CompanyVO();
+        company.setName("My Company");
+        company.setPhone("+1 (828) 533-2655");
+        company.setAddress("200 Adelaide W, Toronto, ON M5H 1W7");
+        company.setContact(createMyContactVO());
+		return company;
+	}
+
+	private ContactVO createMyContactVO() {
+		ContactVO contact = new ContactVO();
+        contact.setEmail("my.contact@stelaecor.com");
+        contact.setName(createMyContactNameVO());
+		return contact;
+	}
+
+	private ContactNameVO createMyContactNameVO() {
+		ContactNameVO contactName = new ContactNameVO();
+    	contactName.setFirst("My");
+    	contactName.setLast("Contact");
+		return contactName;
+	}
     
     @Test
     public void testGetCompanies() throws Exception {
     	
     	Company company1 = this.companyList.get(0);
-    	Contact companyContact1 = company1.getContact();
     	Company company2 = this.companyList.get(1);
-    	Contact companyContact2 = company2.getContact();
     	
         mockMvc.perform(get("/companies"))
                 .andExpect(status().isOk())
@@ -94,22 +122,21 @@ public class CompanyControllerTest {
         		  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(company1.getId()))))
         		  .andExpect(jsonPath("$.elements[0].name", is(company1.getName())))
         		  .andExpect(jsonPath("$.elements[0].phone", is(company1.getPhone())))
-    		      .andExpect(jsonPath("$.elements[0].contact.email", is(companyContact1.getEmail())))
-    		      .andExpect(jsonPath("$.elements[0].contact.name.first", is(companyContact1.getFirstName())))
-        		  .andExpect(jsonPath("$.elements[0].contact.name.last", is(companyContact1.getLastName())))
+    		      .andExpect(jsonPath("$.elements[0].contact.email", is(company1.getContactEmail())))
+    		      .andExpect(jsonPath("$.elements[0].contact.name.first", is(company1.getContactFirstName())))
+        		  .andExpect(jsonPath("$.elements[0].contact.name.last", is(company1.getContactLastName())))
 				  .andExpect(jsonPath("$.elements[1].id", is(String.valueOf(company2.getId()))))
 				  .andExpect(jsonPath("$.elements[1].name", is(company2.getName())))
 				  .andExpect(jsonPath("$.elements[1].phone", is(company2.getPhone())))
-			      .andExpect(jsonPath("$.elements[1].contact.email", is(companyContact2.getEmail())))
-			      .andExpect(jsonPath("$.elements[1].contact.name.first", is(companyContact2.getFirstName())))
-				  .andExpect(jsonPath("$.elements[1].contact.name.last", is(companyContact2.getLastName())));
+			      .andExpect(jsonPath("$.elements[1].contact.email", is(company2.getContactEmail())))
+			      .andExpect(jsonPath("$.elements[1].contact.name.first", is(company2.getContactFirstName())))
+				  .andExpect(jsonPath("$.elements[1].contact.name.last", is(company2.getContactLastName())));
     }
     
     @Test
     public void testGetCompany() throws Exception {
     	
     	Company company = this.companyList.get(0);
-    	Contact companyContact = company.getContact();
     	String companyId = String.valueOf(company.getId());
     	
         mockMvc.perform(get("/companies/" + companyId))
@@ -119,16 +146,60 @@ public class CompanyControllerTest {
         		  .andExpect(jsonPath("$.name", is(company.getName())))
         		  .andExpect(jsonPath("$.address", is(company.getAddress())))
         		  .andExpect(jsonPath("$.phone", is(company.getPhone())))
-        		  .andExpect(jsonPath("$.contact.email", is(companyContact.getEmail())))
-        		  .andExpect(jsonPath("$.contact.name.first", is(companyContact.getFirstName())))
-        		  .andExpect(jsonPath("$.contact.name.last", is(companyContact.getLastName())));
+        		  .andExpect(jsonPath("$.contact.email", is(company.getContactEmail())))
+        		  .andExpect(jsonPath("$.contact.name.first", is(company.getContactFirstName())))
+        		  .andExpect(jsonPath("$.contact.name.last", is(company.getContactLastName())));
     }
     
     @Test
-    public void testGetCompanyNotFound() throws Exception {
+    public void testGetCompany_NotFound() throws Exception {
         mockMvc.perform(get("/companies/10000"))
                 .andExpect(status().is(404));
     }
+    
+    @Test
+    public void testAddCompany() throws Exception {
+    	
+        CompanyVO company = createMyCompanyVO();
+        ContactVO contact = company.getContact();
+        ContactNameVO contactName = contact.getName();
+
+    	mockMvc.perform(post("/companies")
+    	  .content(asJsonString(company))
+    	  .contentType(MediaType.APPLICATION_JSON)
+    	  .accept(MediaType.APPLICATION_JSON))
+    	  .andExpect(jsonPath("$.id").exists())
+    	  .andExpect(jsonPath("$.name", is(company.getName())))
+		  .andExpect(jsonPath("$.address", is(company.getAddress())))
+		  .andExpect(jsonPath("$.phone", is(company.getPhone())))
+		  .andExpect(jsonPath("$.contact.email", is(contact.getEmail())))
+		  .andExpect(jsonPath("$.contact.name.first", is(contactName.getFirst())))
+		  .andExpect(jsonPath("$.contact.name.last", is(contactName.getLast())));
+    }
+    
+//    @Test
+//    public void testUpdateCompany() throws Exception {
+//    	
+//    	Company companyToUpdate = this.companyList.get(0);
+//    	String companyToUpdateId = String.valueOf(companyToUpdate.getId());
+//    	
+//        CompanyVO company = createMyCompanyVO();
+//        ContactVO contact = company.getContact();
+//        ContactNameVO contactName = contact.getName();
+//
+//    	mockMvc.perform(post("/companies/" + companyToUpdateId)
+//    	  .content(asJsonString(company))
+//    	  .contentType(MediaType.APPLICATION_JSON)
+//    	  .accept(MediaType.APPLICATION_JSON))
+//    	  .andExpect(jsonPath("$.id", is(companyToUpdateId)));
+////    	  .andExpect(jsonPath("$.name", is(company.getName())))
+////		  .andExpect(jsonPath("$.address", is(company.getAddress())))
+////		  .andExpect(jsonPath("$.phone", is(company.getPhone())))
+////		  .andExpect(jsonPath("$.contact.email", is(contact.getEmail())))
+////		  .andExpect(jsonPath("$.contact.name.first", is(contactName.getFirst())))
+////		  .andExpect(jsonPath("$.contact.name.last", is(contactName.getLast())));
+//    }
+
 
 
 }
