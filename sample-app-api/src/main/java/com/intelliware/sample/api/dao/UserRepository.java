@@ -2,9 +2,9 @@ package com.intelliware.sample.api.dao;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.intelliware.sample.api.model.Company;
+import com.intelliware.sample.api.model.User;
 
-public interface UserRepository extends CrudRepository<Company, Long>{
+public interface UserRepository extends CrudRepository<User, Long>{
 
 
 }

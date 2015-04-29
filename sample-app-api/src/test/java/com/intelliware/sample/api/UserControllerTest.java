@@ -55,6 +55,16 @@ public class UserControllerTest {
         
         userRepository.deleteAll();
         
+        User user = new User();
+        user.setName("Ada Lovelace");
+        user.setEmail("countess_1815@gmail.com");
+        userList.add(userRepository.save(user));
+        
+        user = new User();
+        user.setName("Charles Babbage");
+        user.setEmail("computer_dad_1791@gmail.com");
+        userList.add(userRepository.save(user));
+        
     }
 
 }
