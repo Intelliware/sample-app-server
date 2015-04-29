@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.intelliware.sample.api.dao.CompanyRepository;
@@ -23,6 +25,14 @@ public class CompanyController {
 
 	@Autowired
 	private CompanyRepository companyDao;
+	
+	private Company findCompany(String id) {
+		Company company = companyDao.findOne(Long.valueOf(id));
+		if (company == null){
+			throw new CompanyNotFoundException();
+		}
+		return company;
+	}
 	
 
 	private Company createCompany(CompanyVO inputCompany) {
@@ -86,10 +96,7 @@ public class CompanyController {
 
 	@RequestMapping(value="/companies/{id}", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
 	public CompanyVO getCompany(@PathVariable String id) {
-		Company company = companyDao.findOne(Long.valueOf(id));
-		if (company == null){
-			throw new CompanyNotFoundException();
-		}
+		Company company = findCompany(id);
 		return convertToCompanyVO(company);
 	}
 	
@@ -102,22 +109,18 @@ public class CompanyController {
 	
 	@RequestMapping(value="/companies/{id}", method=RequestMethod.PUT, consumes="application/json;charset=UTF-8")
 	public CompanyVO updateCompany(@PathVariable String id, @RequestBody CompanyVO inputCompany) {
-		
-		Company company = companyDao.findOne(Long.valueOf(id));
-		if (company == null){
-			throw new CompanyNotFoundException();
-		}
-		
+		Company company = findCompany(id);
 		setCompanyAttributes(inputCompany, company);	
 		companyDao.save(company);
 		return convertToCompanyVO(company);
 	}
 	
-//	@RequestMapping(value="/companies/{id}", method=RequestMethod.PUT, consumes="application/json;charset=UTF-8")
-//	public CompanyVO deleteCompany(@PathVariable String id, @RequestBody CompanyVO inputCompany) {
-//		
-//		return new CompanyVO();
-//	}
+	@RequestMapping(value="/companies/{id}", method=RequestMethod.DELETE)
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteCompany(@PathVariable String id) {
+		Company company = findCompany(id);
+		companyDao.delete(company);
+	}
 	
 
 }

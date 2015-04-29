@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -219,14 +220,25 @@ public class CompanyControllerTest {
                 .andExpect(status().is(404));
     }
     
-//    @Test
-//    public void testDeleteCompany() throws Exception {
-//    	
-//    	Company companyToDelete = this.companyList.get(0);
-//    	String companyToDeleteId = String.valueOf(companyToDelete.getId());
-//    	
-//    }
+    @Test
+    public void testDeleteCompany() throws Exception {
+    	
+    	Company companyToDelete = this.companyList.get(0);
+    	String companyToDeleteId = String.valueOf(companyToDelete.getId());
+    	
+    	mockMvc.perform(delete("/companies/" + companyToDeleteId))
+    			.andExpect(status().is(204));
+    	
+    	assertEquals(1, companyRepository.count());
+    }
 
+    @Test
+    public void testDeleteCompany_NotFound() throws Exception {
+    	
+    	mockMvc.perform(delete("/companies/10000"))
+    			.andExpect(status().is(404));
+
+    }
 
 
 
