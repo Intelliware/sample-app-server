@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -177,28 +178,39 @@ public class CompanyControllerTest {
 		  .andExpect(jsonPath("$.contact.name.last", is(contactName.getLast())));
     }
     
-//    @Test
-//    public void testUpdateCompany() throws Exception {
-//    	
-//    	Company companyToUpdate = this.companyList.get(0);
-//    	String companyToUpdateId = String.valueOf(companyToUpdate.getId());
-//    	
-//        CompanyVO company = createMyCompanyVO();
-//        ContactVO contact = company.getContact();
-//        ContactNameVO contactName = contact.getName();
-//
-//    	mockMvc.perform(post("/companies/" + companyToUpdateId)
-//    	  .content(asJsonString(company))
-//    	  .contentType(MediaType.APPLICATION_JSON)
-//    	  .accept(MediaType.APPLICATION_JSON))
-//    	  .andExpect(jsonPath("$.id", is(companyToUpdateId)));
-////    	  .andExpect(jsonPath("$.name", is(company.getName())))
-////		  .andExpect(jsonPath("$.address", is(company.getAddress())))
-////		  .andExpect(jsonPath("$.phone", is(company.getPhone())))
-////		  .andExpect(jsonPath("$.contact.email", is(contact.getEmail())))
-////		  .andExpect(jsonPath("$.contact.name.first", is(contactName.getFirst())))
-////		  .andExpect(jsonPath("$.contact.name.last", is(contactName.getLast())));
-//    }
+    @Test
+    public void testUpdateCompany() throws Exception {
+    	
+    	Company companyToUpdate = this.companyList.get(0);
+    	String companyToUpdateId = String.valueOf(companyToUpdate.getId());
+    	
+        CompanyVO company = createMyCompanyVO();
+        ContactVO contact = company.getContact();
+        ContactNameVO contactName = contact.getName();
+
+    	mockMvc.perform(put("/companies/" + companyToUpdateId)
+    	  .content(asJsonString(company))
+    	  .contentType(MediaType.APPLICATION_JSON)
+    	  .accept(MediaType.APPLICATION_JSON))
+    	  .andExpect(jsonPath("$.id", is(companyToUpdateId)))
+    	  .andExpect(jsonPath("$.name", is(company.getName())))
+		  .andExpect(jsonPath("$.address", is(company.getAddress())))
+		  .andExpect(jsonPath("$.phone", is(company.getPhone())))
+		  .andExpect(jsonPath("$.contact.email", is(contact.getEmail())))
+		  .andExpect(jsonPath("$.contact.name.first", is(contactName.getFirst())))
+		  .andExpect(jsonPath("$.contact.name.last", is(contactName.getLast())));
+    }
+    
+    @Test
+    public void testUpdateCompany_NotFound() throws Exception {
+        CompanyVO company = createMyCompanyVO();
+    	
+        mockMvc.perform(put("/companies/10000")
+        		.content(asJsonString(company))
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(404));
+    }
 
 
 

@@ -96,23 +96,27 @@ public class CompanyController {
 		return convertToCompanyVO(company);
 	}
 	
-//	@RequestMapping(value="/companies/{id}", method=RequestMethod.PUT, consumes="application/json;charset=UTF-8")
-//	public CompanyVO updateCompany(@PathVariable String id, @RequestBody CompanyVO inputCompany) {
-//		Company companyToUpdate = companyDao.findOne(Long.valueOf(id));
-//		Long contactId = companyToUpdate.getContact().getId();
-//		Contact contactToUpdate = contactDao.findOne(contactId);
-//		
-//		ContactVO inputContact = inputCompany.getContact();
-//		ContactNameVO inputcontactName = inputContact.getName();
-//		
-//		contactToUpdate.setEmail(inputContact.s);
-//		
-//		Contact contact = createContact(inputCompany);
-//		contactDao.save(contact);
-//		Company company = createCompany(inputCompany, contact);
-//		companyDao.save(company);
-//		return createCompanyVOWithAddress(company);
-//	}
+	@RequestMapping(value="/companies/{id}", method=RequestMethod.PUT, consumes="application/json;charset=UTF-8")
+	public CompanyVO updateCompany(@PathVariable String id, @RequestBody CompanyVO inputCompany) {
+		
+		Company company = companyDao.findOne(Long.valueOf(id));
+		if (company == null){
+			throw new CompanyNotFoundException();
+		}
+		
+		ContactVO inputContact = inputCompany.getContact();
+		ContactNameVO inputContactName = inputContact.getName();
+		
+		company.setName(inputCompany.getName());
+		company.setAddress(inputCompany.getAddress());
+		company.setPhone(inputCompany.getPhone());
+		company.setContactEmail(inputContact.getEmail());
+		company.setContactFirstName(inputContactName.getFirst());
+		company.setContactLastName(inputContactName.getLast());
+		
+		companyDao.save(company);
+		return convertToCompanyVO(company);
+	}
 	
 
 }
