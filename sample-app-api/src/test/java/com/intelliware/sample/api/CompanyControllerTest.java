@@ -2,6 +2,7 @@ package com.intelliware.sample.api;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -176,6 +177,8 @@ public class CompanyControllerTest {
 		  .andExpect(jsonPath("$.contact.email", is(contact.getEmail())))
 		  .andExpect(jsonPath("$.contact.name.first", is(contactName.getFirst())))
 		  .andExpect(jsonPath("$.contact.name.last", is(contactName.getLast())));
+    	
+    	assertEquals(3, companyRepository.count());
     }
     
     @Test
@@ -199,6 +202,10 @@ public class CompanyControllerTest {
 		  .andExpect(jsonPath("$.contact.email", is(contact.getEmail())))
 		  .andExpect(jsonPath("$.contact.name.first", is(contactName.getFirst())))
 		  .andExpect(jsonPath("$.contact.name.last", is(contactName.getLast())));
+    	
+    	assertEquals(2, companyRepository.count());
+    	
+        
     }
     
     @Test
@@ -211,6 +218,15 @@ public class CompanyControllerTest {
         		.accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(404));
     }
+    
+//    @Test
+//    public void testDeleteCompany() throws Exception {
+//    	
+//    	Company companyToDelete = this.companyList.get(0);
+//    	String companyToDeleteId = String.valueOf(companyToDelete.getId());
+//    	
+//    }
+
 
 
 
