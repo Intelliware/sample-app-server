@@ -1,32 +1,35 @@
 package com.intelliware.sample.vo;
 
-import java.util.Set;
-
 public class UserVO {
 
-	private String id;
-	private String username;
-	private Set<String> authorities;
+	private long id;
+	private String name;
+	private String email;
 	
-	public String getId() {
+	public UserVO(){}
+	
+	public long getId() {
 		return id;
 	}
-	public void setId(String id) {
+
+	public void setId(long id) {
 		this.id = id;
 	}
-	public String getUsername() {
-		return username;
+
+	public String getName() {
+		return name;
 	}
-	public void setUsername(String username) {
-		this.username = username;
+
+	public void setName(String name) {
+		this.name = name;
 	}
-	public Set<String> getAuthorities() {
-		return authorities;
+
+	public String getEmail() {
+		return email;
 	}
-	public void setAuthorities(Set<String> authorities) {
-		this.authorities = authorities;
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
-	
-	
 	
 }
