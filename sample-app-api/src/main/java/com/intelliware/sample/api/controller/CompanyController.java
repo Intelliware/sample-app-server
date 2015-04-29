@@ -26,16 +26,20 @@ public class CompanyController {
 	
 
 	private Company createCompany(CompanyVO inputCompany) {
-		ContactVO inputContact = inputCompany.getContact();
-		ContactNameVO inputContactName = inputContact.getName();
 		Company company = new Company();
-		company.setAddress(inputCompany.getAddress());
-		company.setPhone(inputCompany.getPhone());
-		company.setName(inputCompany.getName());
-		company.setContactEmail(inputContact.getEmail());
-		company.setContactFirstName(inputContactName.getFirst());
-		company.setContactLastName(inputContactName.getLast());
+		setCompanyAttributes(inputCompany, company);
 		return company;
+	}
+
+	private void setCompanyAttributes(CompanyVO companyVO, Company company) {
+		ContactVO contactVO = companyVO.getContact();
+		ContactNameVO contactNameVO = contactVO.getName();
+		company.setAddress(companyVO.getAddress());
+		company.setPhone(companyVO.getPhone());
+		company.setName(companyVO.getName());
+		company.setContactEmail(contactVO.getEmail());
+		company.setContactFirstName(contactNameVO.getFirst());
+		company.setContactLastName(contactNameVO.getLast());
 	}
 	
 	private CompanyVO convertToCompanyVO(Company company) {	
@@ -104,19 +108,16 @@ public class CompanyController {
 			throw new CompanyNotFoundException();
 		}
 		
-		ContactVO inputContact = inputCompany.getContact();
-		ContactNameVO inputContactName = inputContact.getName();
-		
-		company.setName(inputCompany.getName());
-		company.setAddress(inputCompany.getAddress());
-		company.setPhone(inputCompany.getPhone());
-		company.setContactEmail(inputContact.getEmail());
-		company.setContactFirstName(inputContactName.getFirst());
-		company.setContactLastName(inputContactName.getLast());
-		
+		setCompanyAttributes(inputCompany, company);	
 		companyDao.save(company);
 		return convertToCompanyVO(company);
 	}
+	
+//	@RequestMapping(value="/companies/{id}", method=RequestMethod.PUT, consumes="application/json;charset=UTF-8")
+//	public CompanyVO deleteCompany(@PathVariable String id, @RequestBody CompanyVO inputCompany) {
+//		
+//		return new CompanyVO();
+//	}
 	
 
 }
