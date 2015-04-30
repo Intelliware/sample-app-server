@@ -64,11 +64,15 @@ public class UserControllerTest {
         userRepository.deleteAll();
         
         User user = new User();
+        user.setUsername("c_babbs");
+        user.setPassword("password");
         user.setName("Charles Babbage");
         user.setEmail("computer_dad_1791@gmail.com");
         userList.add(userRepository.save(user));
         
         user = new User();
+        user.setUsername("countess_lovelace");
+        user.setPassword("password");
         user.setName("Ada Lovelace");
         user.setEmail("countess_1815@gmail.com");
         userList.add(userRepository.save(user));
