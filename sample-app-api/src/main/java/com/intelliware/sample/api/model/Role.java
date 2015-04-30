@@ -10,8 +10,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.springframework.security.core.GrantedAuthority;
+
 @Entity
-public class Role {
+public class Role implements GrantedAuthority{
 
 	@ManyToMany
 	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "role_id"),
@@ -49,8 +53,9 @@ public class Role {
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
 	}
-	
-	
 
-	
+	@Override
+	public String getAuthority() {
+		return getRoleName();
+	}
 }

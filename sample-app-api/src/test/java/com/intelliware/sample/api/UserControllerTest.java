@@ -25,7 +25,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intelliware.sample.api.dao.UserRepository;
-import com.intelliware.sample.api.model.Company;
 import com.intelliware.sample.api.model.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)

@@ -136,6 +136,7 @@ public class CompanyControllerTest {
 				  .andExpect(jsonPath("$.elements[1].contact.name.last", is(company2.getContactLastName())));
     }
     
+    
     @Test
     public void testGetCompany() throws Exception {
     	

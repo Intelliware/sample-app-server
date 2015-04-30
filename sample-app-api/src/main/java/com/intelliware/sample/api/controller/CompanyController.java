@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -82,7 +83,7 @@ public class CompanyController {
 		return contactNameVO;
 	}
 
-	
+	@PreAuthorize("hasAnyRole('COMPANY.CREATE', 'COMPANY.EDIT', 'COMPANY')")
 	@RequestMapping(value="/companies", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
 	public PageableListVO<CompanyVO> getCompanies() {
 		Iterable<Company> companies = companyDao.findAll();
@@ -94,12 +95,14 @@ public class CompanyController {
 	}
 	
 
+	@PreAuthorize("hasAnyRole('COMPANY.CREATE', 'COMPANY.EDIT', 'COMPANY')")
 	@RequestMapping(value="/companies/{id}", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
 	public CompanyVO getCompany(@PathVariable String id) {
 		Company company = findCompany(id);
 		return convertToCompanyVO(company);
 	}
 	
+	@PreAuthorize("hasRole('COMPANY.CREATE')")
 	@RequestMapping(value="/companies", method=RequestMethod.POST, consumes="application/json;charset=UTF-8")
 	public CompanyVO addCompany(@RequestBody CompanyVO inputCompany) {
 		Company company = createCompany(inputCompany);
@@ -107,6 +110,7 @@ public class CompanyController {
 		return convertToCompanyVO(company);
 	}
 	
+	@PreAuthorize("hasAnyRole('COMPANY.CREATE', 'COMPANY.EDIT')")
 	@RequestMapping(value="/companies/{id}", method=RequestMethod.PUT, consumes="application/json;charset=UTF-8")
 	public CompanyVO updateCompany(@PathVariable String id, @RequestBody CompanyVO inputCompany) {
 		Company company = findCompany(id);
@@ -115,6 +119,7 @@ public class CompanyController {
 		return convertToCompanyVO(company);
 	}
 	
+	@PreAuthorize("hasRole('COMPANY.CREATE')")
 	@RequestMapping(value="/companies/{id}", method=RequestMethod.DELETE)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteCompany(@PathVariable String id) {
