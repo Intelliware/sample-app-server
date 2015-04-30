@@ -8,11 +8,20 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
+
+import com.intelliware.sample.api.dao.UserRepository;
+import com.intelliware.sample.api.service.SampleUserDetailsService;
 
 @Configuration
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+	
+	@Autowired
+	private UserRepository userRepository;
+	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.httpBasic().authenticationEntryPoint(getAuthenticationEntryPoint())
@@ -29,8 +38,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
 	@Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-            .inMemoryAuthentication()
-                .withUser("a").password("b").roles("USER", "COMPANY");
+        auth.userDetailsService(userDetailsService()).passwordEncoder( new BCryptPasswordEncoder());
     }
+
+	@Override
+    protected UserDetailsService userDetailsService() {
+		if( userRepository == null) throw new IllegalStateException();
+		return new SampleUserDetailsService(userRepository);
+	}
 }
