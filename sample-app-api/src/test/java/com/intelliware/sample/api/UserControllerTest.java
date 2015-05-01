@@ -1,7 +1,9 @@
 package com.intelliware.sample.api;
 
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -9,8 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
+import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -47,8 +49,8 @@ public class UserControllerTest {
             Charset.forName("utf8"));
 
     private MockMvc mockMvc;
-    
-    private List<User> userList = new ArrayList<>();
+    private User userA;
+    private User userB;
     
     @Autowired
     private UserRepository userRepository;
@@ -56,45 +58,40 @@ public class UserControllerTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
     
+    @Autowired
+    private FilterChainProxy springSecurityFilterChain;
+    
     @Before
     public void setup() throws Exception {
-        this.mockMvc = webAppContextSetup(webApplicationContext).build();
+        this.mockMvc = webAppContextSetup(webApplicationContext)
+        		.addFilters(this.springSecurityFilterChain)
+        		.build();
         
-        userRepository.deleteAll();
-        
-        User user = new User();
-        user.setUsername("c_babbs");
-        user.setPassword("password");
-        user.setName("Charles Babbage");
-        user.setEmail("computer_dad_1791@gmail.com");
-        userList.add(userRepository.save(user));
-        
-        user = new User();
-        user.setUsername("countess_lovelace");
-        user.setPassword("password");
-        user.setName("Ada Lovelace");
-        user.setEmail("countess_1815@gmail.com");
-        userList.add(userRepository.save(user));
-        
+        Iterator<User> userIter = userRepository.findAll().iterator();
+        userA = userIter.next();
+        userB = userIter.next();
+
     }
     
     @Test
     public void testGetUsers() throws Exception {
-
-    	User charles = this.userList.get(0);
-    	User ada = this.userList.get(1);
     	
-        mockMvc.perform(get("/users"))
+        mockMvc.perform(
+        			get("/users")
+        			.with(httpBasic("a","password"))
+        		)
                 .andExpect(status().isOk())
                   .andExpect(content().contentType(contentType))
-        		  .andExpect(jsonPath("$.elements", hasSize(2)))
-        		  .andExpect(jsonPath("$._metadata.totalElements", is(2)))
-        		  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(charles.getId()))))
-        		  .andExpect(jsonPath("$.elements[0].name", is(charles.getName())))
-        		  .andExpect(jsonPath("$.elements[0].email", is(charles.getEmail())))
-				  .andExpect(jsonPath("$.elements[1].id", is(String.valueOf(ada.getId()))))
-				  .andExpect(jsonPath("$.elements[1].name", is(ada.getName())))
-				  .andExpect(jsonPath("$.elements[1].email", is(ada.getEmail())));
+        		  .andExpect(jsonPath("$.elements", hasSize(7)))
+        		  .andExpect(jsonPath("$._metadata.totalElements", is(7)))
+        		  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(userA.getId()))))
+        		  .andExpect(jsonPath("$.elements[0].name", is(userA.getName())))
+        		  .andExpect(jsonPath("$.elements[0].email", is(userA.getEmail())))
+				  .andExpect(jsonPath("$.elements[1].id", is(String.valueOf(userB.getId()))))
+				  .andExpect(jsonPath("$.elements[1].name", is(userB.getName())))
+				  .andExpect(jsonPath("$.elements[1].email", is(userB.getEmail())));
     }
+    
+
 
 }
