@@ -19,10 +19,8 @@ public class UserController {
 	
 	@Autowired
 	private UserRepository userDao;
-	
-	private boolean inFilteredList(User user, String nameToFilterBy) {
-		return user.getName().toLowerCase().contains(nameToFilterBy.toLowerCase());
-	}
+
+
 	
 	private UserVO convertToUserVO(User user) {
 		UserVO userVO = new UserVO();
@@ -33,16 +31,17 @@ public class UserController {
 	}
 	
 	@RequestMapping(value="/users", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
-	public PageableListVO<UserVO> getUsers(@RequestParam(required = false, value="name") String nameToFilterBy) {
+	public PageableListVO<UserVO> getUsers(@RequestParam(required = false, value="name") String nameToFilterBy,
+										   @RequestParam(required = false, value="_orderBy") String orderProperty) {
+		
 		Iterable<User> users = userDao.findAll();
 		List<UserVO> userVOList = new ArrayList<UserVO>();
 		for (User user : users){
-			if (nameToFilterBy == null || inFilteredList(user, nameToFilterBy)){
-				userVOList.add(convertToUserVO(user));
-			}
+			userVOList.add(convertToUserVO(user));
 		}
 		return new PageableListVO<UserVO>(userVOList);
 	}
+
 
 
 
