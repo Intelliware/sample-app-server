@@ -153,7 +153,8 @@ public class CompanyControllerTest {
     	Company company = this.companyList.get(0);
     	String companyId = String.valueOf(company.getId());
     	
-        mockMvc.perform(get("/companies/" + companyId))
+        mockMvc.perform(get("/companies/" + companyId)
+        		.with(httpBasic("a","password")))
                 .andExpect(status().isOk())
                   .andExpect(content().contentType(contentType))
         		  .andExpect(jsonPath("$.id", is(companyId)))
@@ -167,7 +168,8 @@ public class CompanyControllerTest {
     
     @Test
     public void testGetCompany_NotFound() throws Exception {
-        mockMvc.perform(get("/companies/10000"))
+        mockMvc.perform(get("/companies/10000")
+        		.with(httpBasic("a","password")))
                 .andExpect(status().is(404));
     }
     
@@ -179,6 +181,7 @@ public class CompanyControllerTest {
         ContactNameVO contactName = contact.getName();
 
     	mockMvc.perform(post("/companies")
+    	  .with(httpBasic("a","password"))
     	  .content(asJsonString(company))
     	  .contentType(MediaType.APPLICATION_JSON)
     	  .accept(MediaType.APPLICATION_JSON))
@@ -204,6 +207,7 @@ public class CompanyControllerTest {
         ContactNameVO contactName = contact.getName();
 
     	mockMvc.perform(put("/companies/" + companyToUpdateId)
+    	  .with(httpBasic("a","password"))
     	  .content(asJsonString(company))
     	  .contentType(MediaType.APPLICATION_JSON)
     	  .accept(MediaType.APPLICATION_JSON))
@@ -225,6 +229,7 @@ public class CompanyControllerTest {
         CompanyVO company = createMyCompanyVO();
     	
         mockMvc.perform(put("/companies/10000")
+        		.with(httpBasic("a","password"))
         		.content(asJsonString(company))
         		.contentType(MediaType.APPLICATION_JSON)
         		.accept(MediaType.APPLICATION_JSON))
@@ -237,7 +242,8 @@ public class CompanyControllerTest {
     	Company companyToDelete = this.companyList.get(0);
     	String companyToDeleteId = String.valueOf(companyToDelete.getId());
     	
-    	mockMvc.perform(delete("/companies/" + companyToDeleteId))
+    	mockMvc.perform(delete("/companies/" + companyToDeleteId)
+    		    .with(httpBasic("a","password")))
     			.andExpect(status().is(204));
     	
     	assertEquals(1, companyRepository.count());
@@ -246,7 +252,8 @@ public class CompanyControllerTest {
     @Test
     public void testDeleteCompany_NotFound() throws Exception {
     	
-    	mockMvc.perform(delete("/companies/10000"))
+    	mockMvc.perform(delete("/companies/10000")
+    			.with(httpBasic("a","password")))
     			.andExpect(status().is(404));
 
     }
