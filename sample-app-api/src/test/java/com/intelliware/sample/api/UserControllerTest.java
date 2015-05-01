@@ -50,7 +50,12 @@ public class UserControllerTest {
 
     private MockMvc mockMvc;
     private User userA;
-    private User userB;
+    private User userCompanyAuth;
+    private User userCompanyEditAuth;
+    private User userCompanyCreateAuth;
+    private User userUserAuth;
+    private User userUserEditAuth;
+    private User userUserCreateAuth;
     
     @Autowired
     private UserRepository userRepository;
@@ -69,7 +74,12 @@ public class UserControllerTest {
         
         Iterator<User> userIter = userRepository.findAll().iterator();
         userA = userIter.next();
-        userB = userIter.next();
+        userCompanyAuth = userIter.next();
+        userCompanyEditAuth = userIter.next();
+        userCompanyCreateAuth = userIter.next();
+        userUserAuth = userIter.next();
+        userUserEditAuth = userIter.next();
+        userUserCreateAuth = userIter.next();
 
     }
     
@@ -87,9 +97,43 @@ public class UserControllerTest {
         		  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(userA.getId()))))
         		  .andExpect(jsonPath("$.elements[0].name", is(userA.getName())))
         		  .andExpect(jsonPath("$.elements[0].email", is(userA.getEmail())))
-				  .andExpect(jsonPath("$.elements[1].id", is(String.valueOf(userB.getId()))))
-				  .andExpect(jsonPath("$.elements[1].name", is(userB.getName())))
-				  .andExpect(jsonPath("$.elements[1].email", is(userB.getEmail())));
+				  .andExpect(jsonPath("$.elements[1].id", is(String.valueOf(userCompanyAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[1].name", is(userCompanyAuth.getName())))
+				  .andExpect(jsonPath("$.elements[1].email", is(userCompanyAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[2].id", is(String.valueOf(userCompanyEditAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[2].name", is(userCompanyEditAuth.getName())))
+				  .andExpect(jsonPath("$.elements[2].email", is(userCompanyEditAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[3].id", is(String.valueOf(userCompanyCreateAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[3].name", is(userCompanyCreateAuth.getName())))
+				  .andExpect(jsonPath("$.elements[3].email", is(userCompanyCreateAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[4].id", is(String.valueOf(userUserAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[4].name", is(userUserAuth.getName())))
+				  .andExpect(jsonPath("$.elements[4].email", is(userUserAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[5].id", is(String.valueOf(userUserEditAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[5].name", is(userUserEditAuth.getName())))
+				  .andExpect(jsonPath("$.elements[5].email", is(userUserEditAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[6].id", is(String.valueOf(userUserCreateAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[6].name", is(userUserCreateAuth.getName())))
+				  .andExpect(jsonPath("$.elements[6].email", is(userUserCreateAuth.getEmail())));
+    }
+    
+    @Test
+    public void testGetUsers_WithFilter() throws Exception {
+    	
+        mockMvc.perform(
+        			get("/users/?name=CREATE")
+        			.with(httpBasic("a","password"))
+        		)
+                .andExpect(status().isOk())
+                  .andExpect(content().contentType(contentType))
+        		  .andExpect(jsonPath("$.elements", hasSize(2)))
+        		  .andExpect(jsonPath("$._metadata.totalElements", is(2)))
+				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(userCompanyCreateAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[0].name", is(userCompanyCreateAuth.getName())))
+				  .andExpect(jsonPath("$.elements[0].email", is(userCompanyCreateAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[1].id", is(String.valueOf(userUserCreateAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[1].name", is(userUserCreateAuth.getName())))
+				  .andExpect(jsonPath("$.elements[1].email", is(userUserCreateAuth.getEmail())));
     }
     
 
