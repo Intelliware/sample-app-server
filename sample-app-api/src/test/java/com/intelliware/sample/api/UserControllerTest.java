@@ -117,37 +117,37 @@ public class UserControllerTest {
 				  .andExpect(jsonPath("$.elements[6].email", is(userUserCreateAuth.getEmail())));
     }
     
-//    @Test
-//    public void testGetUsers_WithFilterResults() throws Exception {
-//    	
-//        mockMvc.perform(
-//        			get("/users/?name=CREATE")
-//        			.with(httpBasic("a","password"))
-//        		)
-//                .andExpect(status().isOk())
-//                  .andExpect(content().contentType(contentType))
-//        		  .andExpect(jsonPath("$.elements", hasSize(2)))
-//        		  .andExpect(jsonPath("$._metadata.totalElements", is(2)))
-//				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(userCompanyCreateAuth.getId()))))
-//				  .andExpect(jsonPath("$.elements[0].name", is(userCompanyCreateAuth.getName())))
-//				  .andExpect(jsonPath("$.elements[0].email", is(userCompanyCreateAuth.getEmail())))
-//				  .andExpect(jsonPath("$.elements[1].id", is(String.valueOf(userUserCreateAuth.getId()))))
-//				  .andExpect(jsonPath("$.elements[1].name", is(userUserCreateAuth.getName())))
-//				  .andExpect(jsonPath("$.elements[1].email", is(userUserCreateAuth.getEmail())));
-//    }
+    @Test
+    public void testGetUsers_WithFilterResults() throws Exception {
+    	
+        mockMvc.perform(
+        			get("/users/?name=creaTE")
+        			.with(httpBasic("a","password"))
+        		)
+                .andExpect(status().isOk())
+                  .andExpect(content().contentType(contentType))
+        		  .andExpect(jsonPath("$.elements", hasSize(2)))
+        		  .andExpect(jsonPath("$._metadata.totalElements", is(2)))
+				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(userCompanyCreateAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[0].name", is(userCompanyCreateAuth.getName())))
+				  .andExpect(jsonPath("$.elements[0].email", is(userCompanyCreateAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[1].id", is(String.valueOf(userUserCreateAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[1].name", is(userUserCreateAuth.getName())))
+				  .andExpect(jsonPath("$.elements[1].email", is(userUserCreateAuth.getEmail())));
+    }
     
-//    @Test
-//    public void testGetUsers_WithFilterNoResults() throws Exception {
-//    	
-//        mockMvc.perform(
-//        			get("/users/?name=PAULA ABDUL")
-//        			.with(httpBasic("a","password"))
-//        		)
-//                .andExpect(status().isOk())
-//                  .andExpect(content().contentType(contentType))
-//        		  .andExpect(jsonPath("$.elements", hasSize(0)))
-//        		  .andExpect(jsonPath("$._metadata.totalElements", is(0)));
-//    }
+    @Test
+    public void testGetUsers_WithFilterNoResults() throws Exception {
+    	
+        mockMvc.perform(
+        			get("/users/?name=PAULA ABDUL")
+        			.with(httpBasic("a","password"))
+        		)
+                .andExpect(status().isOk())
+                  .andExpect(content().contentType(contentType))
+        		  .andExpect(jsonPath("$.elements", hasSize(0)))
+        		  .andExpect(jsonPath("$._metadata.totalElements", is(0)));
+    }
 //    
 //    @Test
 //    public void testGetUsers_OrderByName() throws Exception {

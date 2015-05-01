@@ -19,8 +19,13 @@ public class UserController {
 	
 	@Autowired
 	private UserRepository userDao;
-
-
+	
+	private Iterable<User> retrieveUsers(String nameToFilterBy) {
+		if (nameToFilterBy != null){
+			return userDao.findByNameLikeIgnoreCase("%" + nameToFilterBy + "%");
+		}
+		return userDao.findAll();
+	}
 	
 	private UserVO convertToUserVO(User user) {
 		UserVO userVO = new UserVO();
@@ -34,13 +39,14 @@ public class UserController {
 	public PageableListVO<UserVO> getUsers(@RequestParam(required = false, value="name") String nameToFilterBy,
 										   @RequestParam(required = false, value="_orderBy") String orderProperty) {
 		
-		Iterable<User> users = userDao.findAll();
+		Iterable<User> users = retrieveUsers(nameToFilterBy);
 		List<UserVO> userVOList = new ArrayList<UserVO>();
 		for (User user : users){
 			userVOList.add(convertToUserVO(user));
 		}
 		return new PageableListVO<UserVO>(userVOList);
 	}
+
 
 
 
