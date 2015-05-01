@@ -45,7 +45,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
     protected UserDetailsService userDetailsService() {
-		if( userRepository == null) throw new IllegalStateException();
 		return new SampleUserDetailsService(userRepository);
 	}
 }

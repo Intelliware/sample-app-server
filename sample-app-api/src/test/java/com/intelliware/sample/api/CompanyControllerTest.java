@@ -3,6 +3,7 @@ package com.intelliware.sample.api;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -22,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
+import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -63,9 +65,14 @@ public class CompanyControllerTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
     
+    @Autowired
+    private FilterChainProxy springSecurityFilterChain;
+    
     @Before
     public void setup() throws Exception {
-        this.mockMvc = webAppContextSetup(webApplicationContext).build();
+        this.mockMvc = webAppContextSetup(webApplicationContext)
+        		.addFilters(this.springSecurityFilterChain)
+        		.build();
         
         companyRepository.deleteAll();
         
@@ -117,7 +124,10 @@ public class CompanyControllerTest {
     	Company company1 = this.companyList.get(0);
     	Company company2 = this.companyList.get(1);
     	
-        mockMvc.perform(get("/companies"))
+        mockMvc.perform(
+        			get("/companies")
+        			.with(httpBasic("a","password"))
+        		)
                 .andExpect(status().isOk())
                   .andExpect(content().contentType(contentType))
         		  .andExpect(jsonPath("$.elements", hasSize(2)))
