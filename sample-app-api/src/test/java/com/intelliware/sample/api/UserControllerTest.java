@@ -148,41 +148,76 @@ public class UserControllerTest {
         		  .andExpect(jsonPath("$.elements", hasSize(0)))
         		  .andExpect(jsonPath("$._metadata.totalElements", is(0)));
     }
-//    
-//    @Test
-//    public void testGetUsers_OrderByName() throws Exception {
-//    	
-//        mockMvc.perform(
-//        			get("/users/?_orderBy=name")
-//        			.with(httpBasic("a","password"))
-//        		)
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(contentType))
-//	      		  .andExpect(jsonPath("$.elements", hasSize(7)))
-//	      		  .andExpect(jsonPath("$._metadata.totalElements", is(7)))
-//				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(userCompanyAuth.getId()))))
-//				  .andExpect(jsonPath("$.elements[0].name", is(userCompanyAuth.getName())))
-//				  .andExpect(jsonPath("$.elements[0].email", is(userCompanyAuth.getEmail())))
-//				  .andExpect(jsonPath("$.elements[1].id", is(String.valueOf(userCompanyCreateAuth.getId()))))
-//				  .andExpect(jsonPath("$.elements[1].name", is(userCompanyCreateAuth.getName())))
-//				  .andExpect(jsonPath("$.elements[1].email", is(userCompanyCreateAuth.getEmail())))
-//				  .andExpect(jsonPath("$.elements[2].id", is(String.valueOf(userCompanyEditAuth.getId()))))
-//				  .andExpect(jsonPath("$.elements[2].name", is(userCompanyEditAuth.getName())))
-//				  .andExpect(jsonPath("$.elements[2].email", is(userCompanyEditAuth.getEmail())))
-//				  .andExpect(jsonPath("$.elements[3].id", is(String.valueOf(userUserAuth.getId()))))
-//				  .andExpect(jsonPath("$.elements[3].name", is(userUserAuth.getName())))
-//				  .andExpect(jsonPath("$.elements[3].email", is(userUserAuth.getEmail())))
-//				  .andExpect(jsonPath("$.elements[4].id", is(String.valueOf(userUserCreateAuth.getId()))))
-//				  .andExpect(jsonPath("$.elements[4].name", is(userUserCreateAuth.getName())))
-//				  .andExpect(jsonPath("$.elements[4].email", is(userUserCreateAuth.getEmail())))
-//				  .andExpect(jsonPath("$.elements[5].id", is(String.valueOf(userUserEditAuth.getId()))))
-//				  .andExpect(jsonPath("$.elements[5].name", is(userUserEditAuth.getName())))
-//				  .andExpect(jsonPath("$.elements[5].email", is(userUserEditAuth.getEmail())))
-//				  .andExpect(jsonPath("$.elements[6].id", is(String.valueOf(userA.getId()))))
-//	      		  .andExpect(jsonPath("$.elements[6].name", is(userA.getName())))
-//	      		  .andExpect(jsonPath("$.elements[6].email", is(userA.getEmail())));
-//    }
-//    
+    
+    @Test
+    public void testGetUsers_OrderByName() throws Exception {
+    	
+        mockMvc.perform(
+        			get("/users/?_orderBy=name")
+        			.with(httpBasic("a","password"))
+        		)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+	      		  .andExpect(jsonPath("$.elements", hasSize(7)))
+	      		  .andExpect(jsonPath("$._metadata.totalElements", is(7)))
+				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(userCompanyAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[0].name", is(userCompanyAuth.getName())))
+				  .andExpect(jsonPath("$.elements[0].email", is(userCompanyAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[1].id", is(String.valueOf(userCompanyCreateAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[1].name", is(userCompanyCreateAuth.getName())))
+				  .andExpect(jsonPath("$.elements[1].email", is(userCompanyCreateAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[2].id", is(String.valueOf(userCompanyEditAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[2].name", is(userCompanyEditAuth.getName())))
+				  .andExpect(jsonPath("$.elements[2].email", is(userCompanyEditAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[3].id", is(String.valueOf(userUserAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[3].name", is(userUserAuth.getName())))
+				  .andExpect(jsonPath("$.elements[3].email", is(userUserAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[4].id", is(String.valueOf(userUserCreateAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[4].name", is(userUserCreateAuth.getName())))
+				  .andExpect(jsonPath("$.elements[4].email", is(userUserCreateAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[5].id", is(String.valueOf(userUserEditAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[5].name", is(userUserEditAuth.getName())))
+				  .andExpect(jsonPath("$.elements[5].email", is(userUserEditAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[6].id", is(String.valueOf(userA.getId()))))
+	      		  .andExpect(jsonPath("$.elements[6].name", is(userA.getName())))
+	      		  .andExpect(jsonPath("$.elements[6].email", is(userA.getEmail())));
+    }
+    
+    @Test
+    public void testGetUsers_OrderByEmail() throws Exception {
+    	
+        mockMvc.perform(
+        			get("/users/?_orderBy=email")
+        			.with(httpBasic("a","password"))
+        		)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+	      		  .andExpect(jsonPath("$.elements", hasSize(7)))
+	      		  .andExpect(jsonPath("$._metadata.totalElements", is(7)))
+				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(userCompanyAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[0].name", is(userCompanyAuth.getName())))
+				  .andExpect(jsonPath("$.elements[0].email", is(userCompanyAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[1].id", is(String.valueOf(userCompanyCreateAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[1].name", is(userCompanyCreateAuth.getName())))
+				  .andExpect(jsonPath("$.elements[1].email", is(userCompanyCreateAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[2].id", is(String.valueOf(userCompanyEditAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[2].name", is(userCompanyEditAuth.getName())))
+				  .andExpect(jsonPath("$.elements[2].email", is(userCompanyEditAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[3].id", is(String.valueOf(userA.getId()))))
+	      		  .andExpect(jsonPath("$.elements[3].name", is(userA.getName())))
+	      		  .andExpect(jsonPath("$.elements[3].email", is(userA.getEmail())))
+				  .andExpect(jsonPath("$.elements[4].id", is(String.valueOf(userUserAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[4].name", is(userUserAuth.getName())))
+				  .andExpect(jsonPath("$.elements[4].email", is(userUserAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[5].id", is(String.valueOf(userUserCreateAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[5].name", is(userUserCreateAuth.getName())))
+				  .andExpect(jsonPath("$.elements[5].email", is(userUserCreateAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[6].id", is(String.valueOf(userUserEditAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[6].name", is(userUserEditAuth.getName())))
+				  .andExpect(jsonPath("$.elements[6].email", is(userUserEditAuth.getEmail())));
+
+    }
+    
 
 
 }

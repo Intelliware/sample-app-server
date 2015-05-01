@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,9 +21,12 @@ public class UserController {
 	@Autowired
 	private UserRepository userDao;
 	
-	private Iterable<User> retrieveUsers(String nameToFilterBy) {
+	private Iterable<User> retrieveUsers(String nameToFilterBy, String orderProperty) {
 		if (nameToFilterBy != null){
 			return userDao.findByNameLikeIgnoreCase("%" + nameToFilterBy + "%");
+		}
+		if (orderProperty != null){
+			return userDao.findAll(new Sort(Sort.Direction.ASC, orderProperty));
 		}
 		return userDao.findAll();
 	}
@@ -39,7 +43,7 @@ public class UserController {
 	public PageableListVO<UserVO> getUsers(@RequestParam(required = false, value="name") String nameToFilterBy,
 										   @RequestParam(required = false, value="_orderBy") String orderProperty) {
 		
-		Iterable<User> users = retrieveUsers(nameToFilterBy);
+		Iterable<User> users = retrieveUsers(nameToFilterBy, orderProperty);
 		List<UserVO> userVOList = new ArrayList<UserVO>();
 		for (User user : users){
 			userVOList.add(convertToUserVO(user));
