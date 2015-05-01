@@ -146,6 +146,38 @@ public class CompanyControllerTest {
 				  .andExpect(jsonPath("$.elements[1].contact.name.last", is(company2.getContactLastName())));
     }
     
+    @Test
+    public void testGetCompanies_Authorized() throws Exception {
+    	
+        mockMvc.perform(
+        			get("/companies")
+        			.with(httpBasic("Company","password"))
+        			)
+                .andExpect(status().isOk());
+        
+        mockMvc.perform(
+    			get("/companies")
+    			.with(httpBasic("CompanyEdit","password"))
+    			)
+            .andExpect(status().isOk());
+        
+        mockMvc.perform(
+    			get("/companies")
+    			.with(httpBasic("CompanyCreate","password"))
+    			)
+            .andExpect(status().isOk());
+    }
+    
+    @Test
+    public void testGetCompanies_NotAuthorized() throws Exception {
+    	
+        mockMvc.perform(
+        			get("/companies")
+        			.with(httpBasic("User","password"))
+        			)
+                .andExpect(status().is(403));
+    }
+    
     
     @Test
     public void testGetCompany() throws Exception {
@@ -153,8 +185,10 @@ public class CompanyControllerTest {
     	Company company = this.companyList.get(0);
     	String companyId = String.valueOf(company.getId());
     	
-        mockMvc.perform(get("/companies/" + companyId)
-        		.with(httpBasic("a","password")))
+        mockMvc.perform(
+        		get("/companies/" + companyId)
+        		.with(httpBasic("a","password"))
+        		)
                 .andExpect(status().isOk())
                   .andExpect(content().contentType(contentType))
         		  .andExpect(jsonPath("$.id", is(companyId)))
@@ -168,9 +202,49 @@ public class CompanyControllerTest {
     
     @Test
     public void testGetCompany_NotFound() throws Exception {
-        mockMvc.perform(get("/companies/10000")
-        		.with(httpBasic("a","password")))
+        mockMvc.perform(
+        		get("/companies/10000")
+        		.with(httpBasic("a","password"))
+        		)
                 .andExpect(status().is(404));
+    }
+    
+    @Test
+    public void testGetCompany_Authorized() throws Exception {
+    	
+    	Company company = this.companyList.get(0);
+    	String companyId = String.valueOf(company.getId());
+    	
+        mockMvc.perform(
+        		get("/companies/" + companyId)
+        		.with(httpBasic("Company","password"))
+        		)
+                .andExpect(status().isOk());
+        
+        mockMvc.perform(
+        		get("/companies/" + companyId)
+        		.with(httpBasic("CompanyEdit","password"))
+        		)
+                .andExpect(status().isOk());
+        
+        mockMvc.perform(
+        		get("/companies/" + companyId)
+        		.with(httpBasic("CompanyCreate","password"))
+        		)
+                .andExpect(status().isOk());
+    }
+    
+    @Test
+    public void testGetCompany_NotAuthorized() throws Exception {
+    	
+    	Company company = this.companyList.get(0);
+    	String companyId = String.valueOf(company.getId());
+    	
+        mockMvc.perform(
+        		get("/companies/" + companyId)
+        		.with(httpBasic("User","password"))
+        		)
+                .andExpect(status().is(403));
     }
     
     @Test
@@ -180,11 +254,14 @@ public class CompanyControllerTest {
         ContactVO contact = company.getContact();
         ContactNameVO contactName = contact.getName();
 
-    	mockMvc.perform(post("/companies")
-    	  .with(httpBasic("a","password"))
-    	  .content(asJsonString(company))
-    	  .contentType(MediaType.APPLICATION_JSON)
-    	  .accept(MediaType.APPLICATION_JSON))
+    	mockMvc.perform(
+    			post("/companies")
+    			.with(httpBasic("a","password"))
+    			.content(asJsonString(company))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().isOk())
     	  .andExpect(jsonPath("$.id").exists())
     	  .andExpect(jsonPath("$.name", is(company.getName())))
 		  .andExpect(jsonPath("$.address", is(company.getAddress())))
@@ -197,6 +274,54 @@ public class CompanyControllerTest {
     }
     
     @Test
+    public void testAddCompany_Authorized() throws Exception {
+    	
+        CompanyVO company = createMyCompanyVO();
+
+    	mockMvc.perform(
+    			post("/companies")
+    			.with(httpBasic("CompanyCreate","password"))
+    			.content(asJsonString(company))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().isOk());
+    }
+    
+    @Test
+    public void testAddCompany_NotAuthorized() throws Exception {
+    	
+        CompanyVO company = createMyCompanyVO();
+
+    	mockMvc.perform(
+    			post("/companies")
+    			.with(httpBasic("CompanyEdit","password"))
+    			.content(asJsonString(company))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().is(403));
+    	
+    	mockMvc.perform(
+    			post("/companies")
+    			.with(httpBasic("Company","password"))
+    			.content(asJsonString(company))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().is(403));
+    	
+    	mockMvc.perform(
+    			post("/companies")
+    			.with(httpBasic("User","password"))
+    			.content(asJsonString(company))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().is(403));
+    }
+    
+    @Test
     public void testUpdateCompany() throws Exception {
     	
     	Company companyToUpdate = this.companyList.get(0);
@@ -206,11 +331,14 @@ public class CompanyControllerTest {
         ContactVO contact = company.getContact();
         ContactNameVO contactName = contact.getName();
 
-    	mockMvc.perform(put("/companies/" + companyToUpdateId)
-    	  .with(httpBasic("a","password"))
-    	  .content(asJsonString(company))
-    	  .contentType(MediaType.APPLICATION_JSON)
-    	  .accept(MediaType.APPLICATION_JSON))
+    	mockMvc.perform(
+    			put("/companies/" + companyToUpdateId)
+    			.with(httpBasic("a","password"))
+    			.content(asJsonString(company))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().isOk())
     	  .andExpect(jsonPath("$.id", is(companyToUpdateId)))
     	  .andExpect(jsonPath("$.name", is(company.getName())))
 		  .andExpect(jsonPath("$.address", is(company.getAddress())))
@@ -221,6 +349,59 @@ public class CompanyControllerTest {
     	
     	assertEquals(2, companyRepository.count());
     	
+    }
+    
+    public void testUpdateCompany_Authorized() throws Exception {
+    	
+    	Company companyToUpdate = this.companyList.get(0);
+    	String companyToUpdateId = String.valueOf(companyToUpdate.getId());
+    	
+        CompanyVO company = createMyCompanyVO();
+
+    	mockMvc.perform(
+    			put("/companies/" + companyToUpdateId)
+    			.with(httpBasic("CompanyEdit","password"))
+    			.content(asJsonString(company))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().isOk());
+    	
+    	mockMvc.perform(
+    			put("/companies/" + companyToUpdateId)
+    			.with(httpBasic("CompanyCreate","password"))
+    			.content(asJsonString(company))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().isOk());
+        
+    }
+    
+    public void testUpdateCompany_NotAuthorized() throws Exception {
+    	
+    	Company companyToUpdate = this.companyList.get(0);
+    	String companyToUpdateId = String.valueOf(companyToUpdate.getId());
+    	
+        CompanyVO company = createMyCompanyVO();
+
+    	mockMvc.perform(
+    			put("/companies/" + companyToUpdateId)
+    			.with(httpBasic("Company","password"))
+    			.content(asJsonString(company))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().is(403));
+    	
+    	mockMvc.perform(
+    			put("/companies/" + companyToUpdateId)
+    			.with(httpBasic("User","password"))
+    			.content(asJsonString(company))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().is(403));
         
     }
     
@@ -228,11 +409,13 @@ public class CompanyControllerTest {
     public void testUpdateCompany_NotFound() throws Exception {
         CompanyVO company = createMyCompanyVO();
     	
-        mockMvc.perform(put("/companies/10000")
+        mockMvc.perform(
+        		put("/companies/10000")
         		.with(httpBasic("a","password"))
         		.content(asJsonString(company))
         		.contentType(MediaType.APPLICATION_JSON)
-        		.accept(MediaType.APPLICATION_JSON))
+        		.accept(MediaType.APPLICATION_JSON)
+        		)
                 .andExpect(status().is(404));
     }
     
@@ -242,18 +425,62 @@ public class CompanyControllerTest {
     	Company companyToDelete = this.companyList.get(0);
     	String companyToDeleteId = String.valueOf(companyToDelete.getId());
     	
-    	mockMvc.perform(delete("/companies/" + companyToDeleteId)
-    		    .with(httpBasic("a","password")))
+    	mockMvc.perform(
+    			delete("/companies/" + companyToDeleteId)
+    		    .with(httpBasic("a","password"))
+    		    )
     			.andExpect(status().is(204));
     	
     	assertEquals(1, companyRepository.count());
+    }
+    
+    @Test
+    public void testDeleteCompany_Authorized() throws Exception {
+    	
+    	Company companyToDelete = this.companyList.get(0);
+    	String companyToDeleteId = String.valueOf(companyToDelete.getId());
+    	
+    	mockMvc.perform(
+    			delete("/companies/" + companyToDeleteId)
+    		    .with(httpBasic("CompanyCreate","password"))
+    		    )
+    			.andExpect(status().is(204));
+    	
+    }
+    
+    @Test
+    public void testDeleteCompany_NotAuthorized() throws Exception {
+    	
+    	Company companyToDelete = this.companyList.get(0);
+    	String companyToDeleteId = String.valueOf(companyToDelete.getId());
+    	
+    	mockMvc.perform(
+    			delete("/companies/" + companyToDeleteId)
+    		    .with(httpBasic("CompanyEdit","password"))
+    		    )
+    			.andExpect(status().is(403));
+    	
+    	mockMvc.perform(
+    			delete("/companies/" + companyToDeleteId)
+    		    .with(httpBasic("Company","password"))
+    		    )
+    			.andExpect(status().is(403));
+    	
+    	mockMvc.perform(
+    			delete("/companies/" + companyToDeleteId)
+    		    .with(httpBasic("User","password"))
+    		    )
+    			.andExpect(status().is(403));
+    	
     }
 
     @Test
     public void testDeleteCompany_NotFound() throws Exception {
     	
-    	mockMvc.perform(delete("/companies/10000")
-    			.with(httpBasic("a","password")))
+    	mockMvc.perform(
+    			delete("/companies/10000")
+    			.with(httpBasic("a","password"))
+    			)
     			.andExpect(status().is(404));
 
     }
