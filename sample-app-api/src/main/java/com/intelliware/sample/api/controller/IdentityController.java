@@ -3,6 +3,7 @@ package com.intelliware.sample.api.controller;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
