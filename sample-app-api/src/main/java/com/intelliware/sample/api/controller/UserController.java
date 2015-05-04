@@ -34,10 +34,7 @@ public class UserController {
 		if (pageRequest != null){
 			return userDao.findAll(pageRequest);
 		}	
-		if (orderProperty != null){
-			return userDao.findAll(sort);
-		}	
-		return userDao.findAll();
+		return userDao.findAll(sort); //sort can be null
 	}
 	
 	private UserVO convertToUserVO(User user) {
