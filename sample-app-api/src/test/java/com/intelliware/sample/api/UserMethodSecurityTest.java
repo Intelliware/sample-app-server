@@ -20,7 +20,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intelliware.sample.api.dao.UserRepository;
 import com.intelliware.sample.api.model.User;
 import com.intelliware.sample.vo.UserVO;
@@ -30,23 +29,6 @@ import com.intelliware.sample.vo.UserVO;
 @SpringApplicationConfiguration(classes = SampleAppApiApplication.class)
 @WebAppConfiguration
 public class UserMethodSecurityTest {
-	
-	public static String asJsonString(final Object obj) {
-	    try {
-	        final ObjectMapper mapper = new ObjectMapper();
-	        final String jsonContent = mapper.writeValueAsString(obj);
-	        return jsonContent;
-	    } catch (Exception e) {
-	        throw new RuntimeException(e);
-	    }
-	} 
-	
-	private UserVO createMyUserVO() {
-		UserVO userVO = new UserVO();
-		userVO.setName("Elliott");
-		userVO.setEmail("pete@dragon.com");
-		return userVO;
-	}
 	
 	private MockMvc mockMvc;
 	private User user;
@@ -143,12 +125,12 @@ public class UserMethodSecurityTest {
     @Test
     public void testAddUser_Authorized() throws Exception {
     	
-    	UserVO userVO = createMyUserVO();
+    	UserVO userVO = TestUtils.createMyUserVO();
 
     	mockMvc.perform(
     			post("/users")
     			.with(httpBasic("UserCreate","password"))
-    			.content(asJsonString(userVO))
+    			.content(TestUtils.asJsonString(userVO))
     			.contentType(MediaType.APPLICATION_JSON)
     			.accept(MediaType.APPLICATION_JSON)
     			)
@@ -158,12 +140,12 @@ public class UserMethodSecurityTest {
     @Test
     public void testAddUser_NotAuthorized() throws Exception {
     	
-    	UserVO userVO = createMyUserVO();
+    	UserVO userVO = TestUtils.createMyUserVO();
 
     	mockMvc.perform(
     			post("/users")
     			.with(httpBasic("User","password"))
-    			.content(asJsonString(userVO))
+    			.content(TestUtils.asJsonString(userVO))
     			.contentType(MediaType.APPLICATION_JSON)
     			.accept(MediaType.APPLICATION_JSON)
     			)
@@ -172,7 +154,7 @@ public class UserMethodSecurityTest {
     	mockMvc.perform(
     			post("/users")
     			.with(httpBasic("UserEdit","password"))
-    			.content(asJsonString(userVO))
+    			.content(TestUtils.asJsonString(userVO))
     			.contentType(MediaType.APPLICATION_JSON)
     			.accept(MediaType.APPLICATION_JSON)
     			)
@@ -181,7 +163,7 @@ public class UserMethodSecurityTest {
     	mockMvc.perform(
     			post("/users")
     			.with(httpBasic("Company","password"))
-    			.content(asJsonString(userVO))
+    			.content(TestUtils.asJsonString(userVO))
     			.contentType(MediaType.APPLICATION_JSON)
     			.accept(MediaType.APPLICATION_JSON)
     			)

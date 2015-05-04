@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +28,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intelliware.sample.api.dao.UserRepository;
 import com.intelliware.sample.api.model.User;
 import com.intelliware.sample.vo.UserVO;
@@ -39,23 +37,9 @@ import com.intelliware.sample.vo.UserVO;
 @WebAppConfiguration
 public class UserControllerTest {
 	
-	public static String asJsonString(final Object obj) {
-	    try {
-	        final ObjectMapper mapper = new ObjectMapper();
-	        final String jsonContent = mapper.writeValueAsString(obj);
-	        return jsonContent;
-	    } catch (Exception e) {
-	        throw new RuntimeException(e);
-	    }
-	} 
-	
-	private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-            MediaType.APPLICATION_JSON.getSubtype(),
-            Charset.forName("utf8"));
-
+	private MediaType contentType = TestUtils.getContentType();
     private MockMvc mockMvc;
     List<User> userList = new ArrayList<User>();
-    
     
     @Autowired
     private UserRepository userRepository;
@@ -65,13 +49,6 @@ public class UserControllerTest {
     
     @Autowired
     private FilterChainProxy springSecurityFilterChain;
-    
-	private UserVO createMyUserVO() {
-		UserVO userVO = new UserVO();
-		userVO.setName("Elliott");
-		userVO.setEmail("pete@dragon.com");
-		return userVO;
-	}
     
     @Before
     public void setup() throws Exception {
@@ -107,7 +84,6 @@ public class UserControllerTest {
         user.setName("Mary Poppins");
         user.setEmail("super.nanny@email.com");
         userList.add(userRepository.save(user));
-
     }
     
     @Test
@@ -454,12 +430,12 @@ public class UserControllerTest {
     @Test
     public void testAddUser() throws Exception {
     	
-    	UserVO userVO = createMyUserVO();
+    	UserVO userVO = TestUtils.createMyUserVO();
 
     	mockMvc.perform(
     			post("/users")
     			.with(httpBasic("a","password"))
-    			.content(asJsonString(userVO))
+    			.content(TestUtils.asJsonString(userVO))
     			.contentType(MediaType.APPLICATION_JSON)
     			.accept(MediaType.APPLICATION_JSON)
     			)
