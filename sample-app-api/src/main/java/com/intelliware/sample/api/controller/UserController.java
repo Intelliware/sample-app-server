@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,6 +49,15 @@ public class UserController {
 		return user;
 	}
 	
+
+	private User createUser(UserVO inputUser) {
+		User newUser = new User();
+		newUser.setName(inputUser.getName());
+		newUser.setEmail(inputUser.getEmail());
+		return newUser;
+	}
+
+	
 	private UserVO convertToUserVO(User user) {
 		UserVO userVO = new UserVO();
 		userVO.setId(String.valueOf(user.getId()));
@@ -78,7 +88,13 @@ public class UserController {
 		User user = findUser(id);
 		return convertToUserVO(user);
 	}
-
+	
+	@RequestMapping(value="/users", method=RequestMethod.POST, consumes="application/json;charset=UTF-8")
+	public UserVO addUser(@RequestBody UserVO inputUser) {
+		User user = createUser(inputUser);
+		userDao.save(user);
+		return convertToUserVO(user);
+	}
 
 
 
