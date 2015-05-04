@@ -335,39 +335,42 @@ public class UserControllerTest {
 				  .andExpect(jsonPath("$.elements[1].email", is(userUserEditAuth.getEmail())));
     }
     
-//    @Test
-//    public void testGetUsers_PaginationAndFilter() throws Exception {
-//    	
-//        mockMvc.perform(
-//        			get("/users?name=edit&_pageNumber=1&_pageSize=1")
-//        			.with(httpBasic("a","password"))
-//        		)
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(contentType))
-//                .andExpect(content().contentType(contentType))
-//        		  .andExpect(jsonPath("$.elements", hasSize(1)))
-//        		  .andExpect(jsonPath("$._metadata.totalElements", is(1)))
-//				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(userA.getId()))))
-//				  .andExpect(jsonPath("$.elements[0].name", is(userA.getName())))
-//				  .andExpect(jsonPath("$.elements[0].email", is(userA.getEmail())));
-//    }
-//    
-//    @Test
-//    public void testGetUsers_PaginationAndFilterAndOrderBy() throws Exception {
-//    	
-//        mockMvc.perform(
-//        			get("/users?name=a&_pageNumber=1&_pageSize=1&_orderBy=email")
-//        			.with(httpBasic("a","password"))
-//        		)
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(contentType))
-//                .andExpect(content().contentType(contentType))
-//        		  .andExpect(jsonPath("$.elements", hasSize(1)))
-//        		  .andExpect(jsonPath("$._metadata.totalElements", is(1)))
-//				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(userCompanyEditAuth.getId()))))
-//				  .andExpect(jsonPath("$.elements[0].name", is(userCompanyEditAuth.getName())))
-//				  .andExpect(jsonPath("$.elements[0].email", is(userCompanyEditAuth.getEmail())));
-//    }
+    @Test
+    public void testGetUsers_PaginationAndFilter() throws Exception {
+    	
+        mockMvc.perform(
+        			get("/users?name=edit&_pageNumber=1&_pageSize=1")
+        			.with(httpBasic("a","password"))
+        		)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(content().contentType(contentType))
+        		  .andExpect(jsonPath("$.elements", hasSize(1)))
+        		  .andExpect(jsonPath("$._metadata.totalElements", is(1)))
+				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(userA.getId()))))
+				  .andExpect(jsonPath("$.elements[0].name", is(userA.getName())))
+				  .andExpect(jsonPath("$.elements[0].email", is(userA.getEmail())));
+    }
+    
+    @Test
+    public void testGetUsers_PaginationAndFilterAndOrderBy() throws Exception {
+    	
+        mockMvc.perform(
+        			get("/users?name=edit&_pageNumber=1&_pageSize=2&_orderBy=name")
+        			.with(httpBasic("a","password"))
+        		)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(content().contentType(contentType))
+        		  .andExpect(jsonPath("$.elements", hasSize(2)))
+        		  .andExpect(jsonPath("$._metadata.totalElements", is(2)))
+				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(userCompanyEditAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[0].name", is(userCompanyEditAuth.getName())))
+				  .andExpect(jsonPath("$.elements[0].email", is(userCompanyEditAuth.getEmail())))
+				  .andExpect(jsonPath("$.elements[1].id", is(String.valueOf(userUserEditAuth.getId()))))
+				  .andExpect(jsonPath("$.elements[1].name", is(userUserEditAuth.getName())))
+				  .andExpect(jsonPath("$.elements[1].email", is(userUserEditAuth.getEmail())));
+    }
     
     
 
