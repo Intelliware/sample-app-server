@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,6 +47,8 @@ public class UserController {
 		return userVO;
 	}
 	
+	@Transactional
+	@PreAuthorize("hasAnyRole('USER.CREATE', 'USER.EDIT', 'USER')")
 	@RequestMapping(value="/users", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
 	public PageableListVO<UserVO> getUsers(@RequestParam(required = false, value="name") String nameToFilterBy,
 										   @RequestParam(required = false, value="_orderBy") String orderProperty,

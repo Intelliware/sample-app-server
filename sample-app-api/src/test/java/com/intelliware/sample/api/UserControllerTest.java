@@ -372,6 +372,38 @@ public class UserControllerTest {
 				  .andExpect(jsonPath("$.elements[1].email", is(userUserEditAuth.getEmail())));
     }
     
+    @Test
+    public void testGetUsers_Authorized() throws Exception {
+    	
+        mockMvc.perform(
+        			get("/users")
+        			.with(httpBasic("User","password"))
+        			)
+                .andExpect(status().isOk());
+        
+        mockMvc.perform(
+    			get("/users")
+    			.with(httpBasic("UserEdit","password"))
+    			)
+            .andExpect(status().isOk());
+        
+        mockMvc.perform(
+    			get("/users")
+    			.with(httpBasic("UserCreate","password"))
+    			)
+            .andExpect(status().isOk());
+    }
+    
+    @Test
+    public void testGetUsers_NotAuthorized() throws Exception {
+    	
+        mockMvc.perform(
+        			get("/users")
+        			.with(httpBasic("Company","password"))
+        			)
+                .andExpect(status().is(403));
+    }
+    
     
 
 
