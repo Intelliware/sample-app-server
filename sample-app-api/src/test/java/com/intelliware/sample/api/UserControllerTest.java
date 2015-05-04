@@ -404,6 +404,67 @@ public class UserControllerTest {
                 .andExpect(status().is(403));
     }
     
+    @Test
+    public void testGetUser() throws Exception {
+    	
+    	String userId = String.valueOf(userCompanyAuth.getId());
+    	
+        mockMvc.perform(
+        		get("/users/" + userId)
+        		.with(httpBasic("a","password"))
+        		)
+                .andExpect(status().isOk())
+                  .andExpect(content().contentType(contentType))
+        		  .andExpect(jsonPath("$.id", is(userId)))
+        		  .andExpect(jsonPath("$.name", is(userCompanyAuth.getName())))
+        		  .andExpect(jsonPath("$.email", is(userCompanyAuth.getEmail())));
+    }
+    
+    @Test
+    public void testGetUser_NotFound() throws Exception {
+        mockMvc.perform(
+        		get("/users/10000")
+        		.with(httpBasic("a","password"))
+        		)
+                .andExpect(status().is(404));
+    }
+    
+    @Test
+    public void testGetUser_Authorized() throws Exception {
+    	
+    	String userId = String.valueOf(userCompanyAuth.getId());
+    	
+        mockMvc.perform(
+        		get("/users/" + userId)
+        		.with(httpBasic("User","password"))
+        		)
+                .andExpect(status().isOk());
+        
+        mockMvc.perform(
+        		get("/users/" + userId)
+        		.with(httpBasic("UserEdit","password"))
+        		)
+                .andExpect(status().isOk());
+        
+        mockMvc.perform(
+        		get("/users/" + userId)
+        		.with(httpBasic("UserCreate","password"))
+        		)
+                .andExpect(status().isOk());
+    }
+    
+    @Test
+    public void testGetUser_NotAuthorized() throws Exception {
+    	
+    	String userId = String.valueOf(userCompanyAuth.getId());
+    	
+        mockMvc.perform(
+        		get("/users/" + userId)
+        		.with(httpBasic("Company","password"))
+        		)
+                .andExpect(status().is(403));
+    }
+    
     
 
 

@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,6 +40,14 @@ public class UserController {
 		return userDao.findAll(sort); //sort can be null
 	}
 	
+	private User findUser(String id) throws UserNotFoundException {
+		User user = userDao.findOne(Long.valueOf(id));
+		if (user == null){
+			throw new UserNotFoundException();
+		}
+		return user;
+	}
+	
 	private UserVO convertToUserVO(User user) {
 		UserVO userVO = new UserVO();
 		userVO.setId(String.valueOf(user.getId()));
@@ -60,6 +69,14 @@ public class UserController {
 			userVOList.add(convertToUserVO(user));
 		}
 		return new PageableListVO<UserVO>(userVOList);
+	}
+	
+	@Transactional
+	@PreAuthorize("hasAnyRole('USER.CREATE', 'USER.EDIT', 'USER')")
+	@RequestMapping(value="/users/{id}", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+	public UserVO getUser(@PathVariable String id) throws UserNotFoundException {		
+		User user = findUser(id);
+		return convertToUserVO(user);
 	}
 
 
