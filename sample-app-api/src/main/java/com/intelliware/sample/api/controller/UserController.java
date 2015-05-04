@@ -52,11 +52,14 @@ public class UserController {
 
 	private User createUser(UserVO inputUser) {
 		User newUser = new User();
-		newUser.setName(inputUser.getName());
-		newUser.setEmail(inputUser.getEmail());
+		setUserAttributes(inputUser, newUser);
 		return newUser;
 	}
 
+	public void setUserAttributes(UserVO userVO, User user) {
+		user.setName(userVO.getName());
+		user.setEmail(userVO.getEmail());
+	}
 	
 	private UserVO convertToUserVO(User user) {
 		UserVO userVO = new UserVO();
@@ -94,6 +97,14 @@ public class UserController {
 	@RequestMapping(value="/users", method=RequestMethod.POST, consumes="application/json;charset=UTF-8")
 	public UserVO addUser(@RequestBody UserVO inputUser) {
 		User user = createUser(inputUser);
+		userDao.save(user);
+		return convertToUserVO(user);
+	}
+	
+	@RequestMapping(value="/users/{id}", method=RequestMethod.PUT, consumes="application/json;charset=UTF-8")
+	public UserVO updateUser(@PathVariable String id, @RequestBody UserVO inputUser) throws UserNotFoundException{
+		User user = findUser(id);
+		setUserAttributes(inputUser, user);
 		userDao.save(user);
 		return convertToUserVO(user);
 	}

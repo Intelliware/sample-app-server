@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -445,6 +446,31 @@ public class UserControllerTest {
 		  .andExpect(jsonPath("$.email", is(userVO.getEmail())));
     	
     	assertEquals(6, userRepository.count());
+    	
+    }
+    
+    @Test
+    public void testUpdateUser() throws Exception {
+    	
+    	User userToUpdate = userList.get(1);
+    	String userToUpdateId = String.valueOf(userToUpdate.getId());
+    	
+        UserVO userVO = TestUtils.createMyUserVO();
+
+    	mockMvc.perform(
+    			put("/users/" + userToUpdateId)
+    			.with(httpBasic("a","password"))
+    			.content(TestUtils.asJsonString(userVO))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().isOk())
+    	  .andExpect(jsonPath("$.id", is(userToUpdateId)))
+    	  .andExpect(jsonPath("$.name", is(userVO.getName())))
+		  .andExpect(jsonPath("$.email", is(userVO.getEmail())));
+
+    	
+    	assertEquals(5, userRepository.count());
     	
     }
 
