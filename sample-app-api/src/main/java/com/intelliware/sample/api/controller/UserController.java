@@ -89,6 +89,8 @@ public class UserController {
 		return convertToUserVO(user);
 	}
 	
+	@Transactional
+	@PreAuthorize("hasRole('USER.CREATE')")
 	@RequestMapping(value="/users", method=RequestMethod.POST, consumes="application/json;charset=UTF-8")
 	public UserVO addUser(@RequestBody UserVO inputUser) {
 		User user = createUser(inputUser);

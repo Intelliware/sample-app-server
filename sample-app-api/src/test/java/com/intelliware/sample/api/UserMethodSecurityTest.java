@@ -2,6 +2,7 @@ package com.intelliware.sample.api;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -12,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.http.MediaType;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -21,6 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intelliware.sample.api.dao.UserRepository;
 import com.intelliware.sample.api.model.User;
+import com.intelliware.sample.vo.UserVO;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -37,6 +40,13 @@ public class UserMethodSecurityTest {
 	        throw new RuntimeException(e);
 	    }
 	} 
+	
+	private UserVO createMyUserVO() {
+		UserVO userVO = new UserVO();
+		userVO.setName("Elliott");
+		userVO.setEmail("pete@dragon.com");
+		return userVO;
+	}
 	
 	private MockMvc mockMvc;
 	private User user;
@@ -128,6 +138,54 @@ public class UserMethodSecurityTest {
         		.with(httpBasic("Company","password"))
         		)
                 .andExpect(status().is(403));
+    }
+    
+    @Test
+    public void testAddUser_Authorized() throws Exception {
+    	
+    	UserVO userVO = createMyUserVO();
+
+    	mockMvc.perform(
+    			post("/users")
+    			.with(httpBasic("UserCreate","password"))
+    			.content(asJsonString(userVO))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().isOk());
+    }
+    
+    @Test
+    public void testAddUser_NotAuthorized() throws Exception {
+    	
+    	UserVO userVO = createMyUserVO();
+
+    	mockMvc.perform(
+    			post("/users")
+    			.with(httpBasic("User","password"))
+    			.content(asJsonString(userVO))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().is(403));
+    	
+    	mockMvc.perform(
+    			post("/users")
+    			.with(httpBasic("UserEdit","password"))
+    			.content(asJsonString(userVO))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().is(403));
+    	
+    	mockMvc.perform(
+    			post("/users")
+    			.with(httpBasic("Company","password"))
+    			.content(asJsonString(userVO))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().is(403));
     }
 	
 }
