@@ -168,7 +168,7 @@ public class CompanyControllerTest {
     @Test
     public void testUpdateCompany() throws Exception {
     	
-    	Company companyToUpdate = this.companyList.get(0);
+    	Company companyToUpdate = companyList.get(0);
     	String companyToUpdateId = String.valueOf(companyToUpdate.getId());
     	
         CompanyVO company = TestUtils.createMyCompanyVO();
@@ -192,7 +192,6 @@ public class CompanyControllerTest {
 		  .andExpect(jsonPath("$.contact.name.last", is(contactName.getLast())));
     	
     	assertEquals(2, companyRepository.count());
-    	
     }
     
     @Test
