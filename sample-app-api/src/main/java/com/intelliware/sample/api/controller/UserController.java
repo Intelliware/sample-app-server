@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,13 +22,21 @@ public class UserController {
 	@Autowired
 	private UserRepository userDao;
 	
-	private Iterable<User> retrieveUsers(String nameToFilterBy, String orderProperty) {
+	private Iterable<User> retrieveUsers(String nameToFilterBy, String orderProperty, Integer page, Integer pageSize) {
+		Sort sort = orderProperty == null ? null : new Sort(Sort.Direction.ASC, orderProperty);
+		PageRequest pageRequest = page == null || pageSize == null ? null :
+								  	new PageRequest(page - 1, pageSize, sort); //subtract 1 because pageRequest is 0 based		
 		if (nameToFilterBy != null){
-			return userDao.findByNameLikeIgnoreCase("%" + nameToFilterBy + "%");
+			String filterString = "%" + nameToFilterBy + "%";
+			return pageRequest != null ? userDao.findByNameLikeIgnoreCase(filterString, pageRequest) : 
+										 userDao.findByNameLikeIgnoreCase(filterString, sort);
 		}
+		if (pageRequest != null){
+			return userDao.findAll(pageRequest);
+		}	
 		if (orderProperty != null){
-			return userDao.findAll(new Sort(Sort.Direction.ASC, orderProperty));
-		}
+			return userDao.findAll(sort);
+		}	
 		return userDao.findAll();
 	}
 	
@@ -41,9 +50,10 @@ public class UserController {
 	
 	@RequestMapping(value="/users", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
 	public PageableListVO<UserVO> getUsers(@RequestParam(required = false, value="name") String nameToFilterBy,
-										   @RequestParam(required = false, value="_orderBy") String orderProperty) {
-		
-		Iterable<User> users = retrieveUsers(nameToFilterBy, orderProperty);
+										   @RequestParam(required = false, value="_orderBy") String orderProperty,
+										   @RequestParam(required = false, value="_pageNumber") Integer page,
+										   @RequestParam(required = false, value="_pageSize") Integer pageSize) {		
+		Iterable<User> users = retrieveUsers(nameToFilterBy, orderProperty, page, pageSize);
 		List<UserVO> userVOList = new ArrayList<UserVO>();
 		for (User user : users){
 			userVOList.add(convertToUserVO(user));

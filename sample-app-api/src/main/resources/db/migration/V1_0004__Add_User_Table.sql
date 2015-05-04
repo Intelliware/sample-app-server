@@ -24,7 +24,7 @@ insert into role (role_name) values ('COMPANY');
 insert into role (role_name) values ('COMPANY.EDIT');
 insert into role (role_name) values ('COMPANY.CREATE');
 
-insert into user (username, password, name, email) values ('a', '$2a$10$uq5uv8n/UXq7BjdYMTJuvuqOIC6ABD6vO0fYCGArtlKXlEUV1m2va', 'ZZ First User', 'firstUser@email.com');
+insert into user (username, password, name, email) values ('a', '$2a$10$uq5uv8n/UXq7BjdYMTJuvuqOIC6ABD6vO0fYCGArtlKXlEUV1m2va', 'ZZ First User Edit', 'firstUser@email.com');
 
 insert into user_role(user_id, role_id)
 select user.id as user_id, role.id as role_id
