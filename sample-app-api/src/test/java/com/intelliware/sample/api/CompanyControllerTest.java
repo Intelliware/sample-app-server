@@ -44,6 +44,9 @@ public class CompanyControllerTest {
     private MockMvc mockMvc;
     
     private List<Company> companyList = new ArrayList<>();
+    private CompanyVO requestBody = TestUtils.createMyCompanyVO();
+    private ContactVO requestContact = requestBody.getContact();
+    private ContactNameVO requestContactName = requestContact.getName();
     
     @Autowired
     private CompanyRepository companyRepository;
@@ -79,6 +82,7 @@ public class CompanyControllerTest {
         company.setContactFirstName("Mark");
         company.setContactLastName("Zuckerberg");
         companyList.add(companyRepository.save(company));
+
     }
     
     @Test
@@ -141,26 +145,22 @@ public class CompanyControllerTest {
     
     @Test
     public void testAddCompany() throws Exception {
-    	
-        CompanyVO company = TestUtils.createMyCompanyVO();
-        ContactVO contact = company.getContact();
-        ContactNameVO contactName = contact.getName();
 
     	mockMvc.perform(
     			post("/companies")
     			.with(httpBasic("a","password"))
-    			.content(TestUtils.asJsonString(company))
+    			.content(TestUtils.asJsonString(requestBody))
     			.contentType(MediaType.APPLICATION_JSON)
     			.accept(MediaType.APPLICATION_JSON)
     			)
     	  .andExpect(status().isOk())
     	  .andExpect(jsonPath("$.id").exists())
-    	  .andExpect(jsonPath("$.name", is(company.getName())))
-		  .andExpect(jsonPath("$.address", is(company.getAddress())))
-		  .andExpect(jsonPath("$.phone", is(company.getPhone())))
-		  .andExpect(jsonPath("$.contact.email", is(contact.getEmail())))
-		  .andExpect(jsonPath("$.contact.name.first", is(contactName.getFirst())))
-		  .andExpect(jsonPath("$.contact.name.last", is(contactName.getLast())));
+    	  .andExpect(jsonPath("$.name", is(requestBody.getName())))
+		  .andExpect(jsonPath("$.address", is(requestBody.getAddress())))
+		  .andExpect(jsonPath("$.phone", is(requestBody.getPhone())))
+		  .andExpect(jsonPath("$.contact.email", is(requestContact.getEmail())))
+		  .andExpect(jsonPath("$.contact.name.first", is(requestContactName.getFirst())))
+		  .andExpect(jsonPath("$.contact.name.last", is(requestContactName.getLast())));
     	
     	assertEquals(3, companyRepository.count());
     }
@@ -170,38 +170,33 @@ public class CompanyControllerTest {
     	
     	Company companyToUpdate = companyList.get(0);
     	String companyToUpdateId = String.valueOf(companyToUpdate.getId());
-    	
-        CompanyVO company = TestUtils.createMyCompanyVO();
-        ContactVO contact = company.getContact();
-        ContactNameVO contactName = contact.getName();
 
     	mockMvc.perform(
     			put("/companies/" + companyToUpdateId)
     			.with(httpBasic("a","password"))
-    			.content(TestUtils.asJsonString(company))
+    			.content(TestUtils.asJsonString(requestBody))
     			.contentType(MediaType.APPLICATION_JSON)
     			.accept(MediaType.APPLICATION_JSON)
     			)
     	  .andExpect(status().isOk())
     	  .andExpect(jsonPath("$.id", is(companyToUpdateId)))
-    	  .andExpect(jsonPath("$.name", is(company.getName())))
-		  .andExpect(jsonPath("$.address", is(company.getAddress())))
-		  .andExpect(jsonPath("$.phone", is(company.getPhone())))
-		  .andExpect(jsonPath("$.contact.email", is(contact.getEmail())))
-		  .andExpect(jsonPath("$.contact.name.first", is(contactName.getFirst())))
-		  .andExpect(jsonPath("$.contact.name.last", is(contactName.getLast())));
+    	  .andExpect(jsonPath("$.name", is(requestBody.getName())))
+		  .andExpect(jsonPath("$.address", is(requestBody.getAddress())))
+		  .andExpect(jsonPath("$.phone", is(requestBody.getPhone())))
+		  .andExpect(jsonPath("$.contact.email", is(requestContact.getEmail())))
+		  .andExpect(jsonPath("$.contact.name.first", is(requestContactName.getFirst())))
+		  .andExpect(jsonPath("$.contact.name.last", is(requestContactName.getLast())));
     	
     	assertEquals(2, companyRepository.count());
     }
     
     @Test
     public void testUpdateCompany_NotFound() throws Exception {
-        CompanyVO company = TestUtils.createMyCompanyVO();
     	
         mockMvc.perform(
         		put("/companies/10000")
         		.with(httpBasic("a","password"))
-        		.content(TestUtils.asJsonString(company))
+        		.content(TestUtils.asJsonString(requestBody))
         		.contentType(MediaType.APPLICATION_JSON)
         		.accept(MediaType.APPLICATION_JSON)
         		)

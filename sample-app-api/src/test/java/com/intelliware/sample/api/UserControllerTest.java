@@ -42,6 +42,7 @@ public class UserControllerTest {
 	private MediaType contentType = TestUtils.getContentType();
     private MockMvc mockMvc;
     List<User> userList = new ArrayList<User>();
+    private UserVO requestBody = TestUtils.createMyUserVO();
     
     @Autowired
     private UserRepository userRepository;
@@ -431,20 +432,18 @@ public class UserControllerTest {
     
     @Test
     public void testAddUser() throws Exception {
-    	
-    	UserVO userVO = TestUtils.createMyUserVO();
 
     	mockMvc.perform(
     			post("/users")
     			.with(httpBasic("a","password"))
-    			.content(TestUtils.asJsonString(userVO))
+    			.content(TestUtils.asJsonString(requestBody))
     			.contentType(MediaType.APPLICATION_JSON)
     			.accept(MediaType.APPLICATION_JSON)
     			)
     	  .andExpect(status().isOk())
     	  .andExpect(jsonPath("$.id").exists())
-    	  .andExpect(jsonPath("$.name", is(userVO.getName())))
-		  .andExpect(jsonPath("$.email", is(userVO.getEmail())));
+    	  .andExpect(jsonPath("$.name", is(requestBody.getName())))
+		  .andExpect(jsonPath("$.email", is(requestBody.getEmail())));
     	
     	assertEquals(6, userRepository.count());
     	
@@ -456,19 +455,17 @@ public class UserControllerTest {
     	User userToUpdate = userList.get(1);
     	String userToUpdateId = String.valueOf(userToUpdate.getId());
     	
-        UserVO userVO = TestUtils.createMyUserVO();
-
     	mockMvc.perform(
     			put("/users/" + userToUpdateId)
     			.with(httpBasic("a","password"))
-    			.content(TestUtils.asJsonString(userVO))
+    			.content(TestUtils.asJsonString(requestBody))
     			.contentType(MediaType.APPLICATION_JSON)
     			.accept(MediaType.APPLICATION_JSON)
     			)
     	  .andExpect(status().isOk())
     	  .andExpect(jsonPath("$.id", is(userToUpdateId)))
-    	  .andExpect(jsonPath("$.name", is(userVO.getName())))
-		  .andExpect(jsonPath("$.email", is(userVO.getEmail())));
+    	  .andExpect(jsonPath("$.name", is(requestBody.getName())))
+		  .andExpect(jsonPath("$.email", is(requestBody.getEmail())));
 
     	
     	assertEquals(5, userRepository.count());
@@ -477,12 +474,11 @@ public class UserControllerTest {
     
     @Test
     public void testUpdateUser_NotFound() throws Exception {
-        UserVO userVO = TestUtils.createMyUserVO();
     	
         mockMvc.perform(
         		put("/users/10000")
         		.with(httpBasic("a","password"))
-        		.content(TestUtils.asJsonString(userVO))
+        		.content(TestUtils.asJsonString(requestBody))
         		.contentType(MediaType.APPLICATION_JSON)
         		.accept(MediaType.APPLICATION_JSON)
         		)
