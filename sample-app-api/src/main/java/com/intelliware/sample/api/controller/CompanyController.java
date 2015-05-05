@@ -35,7 +35,6 @@ public class CompanyController {
 		}
 		return company;
 	}
-	
 
 	private Company createCompany(CompanyVO inputCompany) {
 		Company company = new Company();
@@ -131,6 +130,4 @@ public class CompanyController {
 		Company company = findCompany(id);
 		companyDao.delete(company);
 	}
-	
-
 }

@@ -22,5 +22,4 @@ public class ContactNameVO {
 	public void setLast(String last) {
 		this.last = last;
 	}
-
 }

@@ -68,10 +68,8 @@ public class CompanyMethodSecurityTest {
         companyId = String.valueOf(companyList.get(0).getId());
         
         requestBody = TestUtils.createMyCompanyVO();
-        
     }
     
-
 	private void performGetCompanies(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
 		for (String username : usernames){
 			mockMvc.perform(

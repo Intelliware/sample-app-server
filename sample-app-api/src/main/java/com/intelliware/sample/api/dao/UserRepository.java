@@ -17,5 +17,4 @@ public interface UserRepository extends PagingAndSortingRepository<User, Long>{
 
 	Page<User> findByNameLikeIgnoreCase(String filterString, Pageable pageable);
 
-	
 }

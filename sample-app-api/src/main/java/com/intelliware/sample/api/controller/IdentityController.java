@@ -37,7 +37,4 @@ public class IdentityController{
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return createIdentityVO(user);
 	}
-
-
-
 }

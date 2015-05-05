@@ -30,7 +30,6 @@ import com.intelliware.sample.api.dao.UserRepository;
 import com.intelliware.sample.api.model.User;
 import com.intelliware.sample.vo.UserVO;
 
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SampleAppApiApplication.class)
 @WebAppConfiguration
@@ -171,5 +170,4 @@ public class UserMethodSecurityTest {
     public void testDeleteUser_NotAuthorized() throws Exception {
 		performDeleteUser(Arrays.asList("UserEdit", "User", "Company"), status().is(403));
     }
-	
 }

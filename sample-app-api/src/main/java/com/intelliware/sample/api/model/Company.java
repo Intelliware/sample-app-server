@@ -1,7 +1,5 @@
 package com.intelliware.sample.api.model;
 
-
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -74,5 +72,4 @@ public class Company {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-
 }

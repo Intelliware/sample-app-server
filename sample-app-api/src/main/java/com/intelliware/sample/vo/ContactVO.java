@@ -1,6 +1,5 @@
 package com.intelliware.sample.vo;
 
-
 public class ContactVO {
 	
 	private String email;
@@ -23,6 +22,4 @@ public class ContactVO {
 	public void setName(ContactNameVO name) {
 		this.name = name;
 	}
-
-
 }

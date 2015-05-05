@@ -1,6 +1,5 @@
 package com.intelliware.sample.vo;
 
-
 public class CompanyVO {
 	
 	private String id;

@@ -26,7 +26,4 @@ public class IdentityVO {
 	public void setAuthorities(Set<String> authorities) {
 		this.authorities = authorities;
 	}
-	
-	
-	
 }

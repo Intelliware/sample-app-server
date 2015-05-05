@@ -229,7 +229,6 @@ public class UserControllerTest {
 				  .andExpect(jsonPath("$.elements[4].id", is(String.valueOf(user5.getId()))))
 				  .andExpect(jsonPath("$.elements[4].name", is(user5.getName())))
 				  .andExpect(jsonPath("$.elements[4].email", is(user5.getEmail())));
-
     }
     
     @Test
@@ -446,7 +445,6 @@ public class UserControllerTest {
 		  .andExpect(jsonPath("$.email", is(requestBody.getEmail())));
     	
     	assertEquals(6, userRepository.count());
-    	
     }
     
     @Test
@@ -467,9 +465,7 @@ public class UserControllerTest {
     	  .andExpect(jsonPath("$.name", is(requestBody.getName())))
 		  .andExpect(jsonPath("$.email", is(requestBody.getEmail())));
 
-    	
     	assertEquals(5, userRepository.count());
-    	
     }
     
     @Test
@@ -509,5 +505,4 @@ public class UserControllerTest {
     			)
     			.andExpect(status().is(404));
     }
-
 }

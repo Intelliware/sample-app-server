@@ -127,7 +127,6 @@ public class IdentityControllerTest {
               .andExpect(jsonPath("$.username", is("UserCreate")))
     		  .andExpect(jsonPath("$.authorities", hasSize(1)))
     		  .andExpect(jsonPath("$.authorities[0]", is("USER.CREATE")));
-
     }
     
     @Test

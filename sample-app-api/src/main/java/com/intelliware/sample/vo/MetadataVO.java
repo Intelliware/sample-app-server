@@ -15,5 +15,4 @@ public class MetadataVO {
 	public void setTotalElements(Long totalElements) {
 		this.totalElements = totalElements;
 	}
-	
 }

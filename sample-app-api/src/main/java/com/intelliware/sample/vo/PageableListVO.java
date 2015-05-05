@@ -34,5 +34,4 @@ public class PageableListVO<T> {
 	public void set_metadata(MetadataVO _metadata) {
 		this._metadata = _metadata;
 	}
-
 }

@@ -109,7 +109,6 @@ public class UserController {
 			return getUsersPaginated(nameToFilterBy, orderProperty, page, pageSize);
 		}
 	}
-
 	
 	@Transactional
 	@PreAuthorize("hasAnyRole('USER.CREATE', 'USER.EDIT', 'USER')")
@@ -146,8 +145,4 @@ public class UserController {
 		User user = findUser(id);
 		userDao.delete(user);
 	}
-
-
-
-
 }
