@@ -22,7 +22,6 @@ import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.google.common.collect.Lists;
@@ -50,27 +49,27 @@ public class UserMethodSecurityTest {
     private FilterChainProxy springSecurityFilterChain;
 
     
-    private void performGetUsers(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
+    private void performGetUsers(List<String> usernames, int expectedStatus) throws Exception {
     	for (String username : usernames){
 	        mockMvc.perform(
 	    			get("/users")
 	    			.with(httpBasic(username,"password"))
 	    			)
-	            .andExpect(expectedStatus);
+	            .andExpect(status().is(expectedStatus));
     	}
 	}
     
-    private void performGetUser(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
+    private void performGetUser(List<String> usernames, int expectedStatus) throws Exception {
     	for (String username : usernames){
 	        mockMvc.perform(
 	        		get("/users/" + userId)
 	        		.with(httpBasic(username, "password"))
 	        		)
-	                .andExpect(expectedStatus);
+	                .andExpect(status().is(expectedStatus));
     	}
 	}
     
-    private void performAddUser(List<String> usernames, ResultMatcher expectedStatus) throws Exception{
+    private void performAddUser(List<String> usernames, int expectedStatus) throws Exception{
 		for (String username : usernames){
 	    	mockMvc.perform(
 	    			post("/users")
@@ -79,11 +78,11 @@ public class UserMethodSecurityTest {
 	    			.contentType(MediaType.APPLICATION_JSON)
 	    			.accept(MediaType.APPLICATION_JSON)
 	    			)
-	    	  .andExpect(expectedStatus);
+	    	  .andExpect(status().is(expectedStatus));
 		}
 	}
     
-    private void performUpdateUser(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
+    private void performUpdateUser(List<String> usernames, int expectedStatus) throws Exception {
     	for (String username : usernames){
         	mockMvc.perform(
         			put("/users/" + userId)
@@ -92,11 +91,11 @@ public class UserMethodSecurityTest {
         			.contentType(MediaType.APPLICATION_JSON)
         			.accept(MediaType.APPLICATION_JSON)
         			)
-        	  .andExpect(expectedStatus);
+        	  .andExpect(status().is(expectedStatus));
     	}
 	}
     
-    private void performDeleteUser(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
+    private void performDeleteUser(List<String> usernames, int expectedStatus) throws Exception {
     	String userToDeleteId = String.valueOf(userList.get(2).getId());
     	for (String username : usernames){
         	mockMvc.perform(
@@ -106,7 +105,7 @@ public class UserMethodSecurityTest {
         			.contentType(MediaType.APPLICATION_JSON)
         			.accept(MediaType.APPLICATION_JSON)
         			)
-        	  .andExpect(expectedStatus);
+        	  .andExpect(status().is(expectedStatus));
     	}
 	}
 
@@ -123,51 +122,51 @@ public class UserMethodSecurityTest {
 
     @Test
     public void testGetUsers_Authorized() throws Exception {
-    	performGetUsers(Arrays.asList("User", "UserEdit", "UserCreate"), status().isOk());
+    	performGetUsers(Arrays.asList("User", "UserEdit", "UserCreate"), 200);
     }
 
 	@Test
     public void testGetUsers_NotAuthorized() throws Exception {
-		performGetUsers(Arrays.asList("Company"), status().is(403));
+		performGetUsers(Arrays.asList("Company"), 403);
     }
     
     @Test
     public void testGetUser_Authorized() throws Exception {
-    	performGetUser(Arrays.asList("User", "UserEdit", "UserCreate"), status().isOk());
+    	performGetUser(Arrays.asList("User", "UserEdit", "UserCreate"), 200);
     }
 
 	@Test
     public void testGetUser_NotAuthorized() throws Exception {
-		performGetUser(Arrays.asList("Company"), status().is(403));
+		performGetUser(Arrays.asList("Company"), 403);
     }
     
     @Test
     public void testAddUser_Authorized() throws Exception {
-    	performAddUser(Arrays.asList("UserCreate"), status().isOk());
+    	performAddUser(Arrays.asList("UserCreate"), 201);
     }
     
 	@Test
     public void testAddUser_NotAuthorized() throws Exception {
-		performAddUser(Arrays.asList("User", "UserEdit", "Company"), status().is(403));
+		performAddUser(Arrays.asList("User", "UserEdit", "Company"), 403);
     }
     
     @Test
     public void testUpdateUser_Authorized() throws Exception {
-    	performUpdateUser(Arrays.asList("UserCreate", "UserEdit"), status().isOk());
+    	performUpdateUser(Arrays.asList("UserCreate", "UserEdit"), 200);
     }
     
 	@Test
     public void testUpdateUser_NotAuthorized() throws Exception {
-		performUpdateUser(Arrays.asList("User", "Company"), status().is(403));
+		performUpdateUser(Arrays.asList("User", "Company"), 403);
     }
     
     @Test
     public void testDeleteUser_Authorized() throws Exception {
-    	performDeleteUser(Arrays.asList("UserCreate"), status().is(204));
+    	performDeleteUser(Arrays.asList("UserCreate"), 204);
     }
 
 	@Test
     public void testDeleteUser_NotAuthorized() throws Exception {
-		performDeleteUser(Arrays.asList("UserEdit", "User", "Company"), status().is(403));
+		performDeleteUser(Arrays.asList("UserEdit", "User", "Company"), 403);
     }
 }

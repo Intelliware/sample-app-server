@@ -439,7 +439,7 @@ public class UserControllerTest {
     			.contentType(MediaType.APPLICATION_JSON)
     			.accept(MediaType.APPLICATION_JSON)
     			)
-    	  .andExpect(status().isOk())
+    	  .andExpect(status().is(201))
     	  .andExpect(jsonPath("$.id").exists())
     	  .andExpect(jsonPath("$.name", is(requestBody.getName())))
 		  .andExpect(jsonPath("$.email", is(requestBody.getEmail())));

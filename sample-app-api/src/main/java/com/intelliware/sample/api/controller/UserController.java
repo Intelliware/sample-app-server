@@ -121,6 +121,7 @@ public class UserController {
 	@Transactional
 	@PreAuthorize("hasRole('USER.CREATE')")
 	@RequestMapping(value="/users", method=RequestMethod.POST, consumes="application/json;charset=UTF-8")
+	@ResponseStatus(HttpStatus.CREATED)
 	public UserVO addUser(@RequestBody UserVO inputUser) {
 		User user = createUser(inputUser);
 		userDao.save(user);
