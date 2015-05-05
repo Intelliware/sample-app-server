@@ -82,7 +82,6 @@ public class CompanyControllerTest {
         company.setContactFirstName("Mark");
         company.setContactLastName("Zuckerberg");
         companyList.add(companyRepository.save(company));
-
     }
     
     @Test

@@ -46,6 +46,19 @@ public class IdentityControllerTest {
         		.addFilters(this.springSecurityFilterChain)
         		.build();
     }
+    
+    private void performGetMeForUsersWithOneRole(String username, String role) throws Exception{
+        mockMvc.perform(
+    			get("/me")
+    			.with(httpBasic(username,"password"))
+    		)
+            .andExpect(status().isOk())
+              .andExpect(content().contentType(contentType))
+              .andExpect(jsonPath("$.id").exists())
+              .andExpect(jsonPath("$.username", is(username)))
+    		  .andExpect(jsonPath("$.authorities", hasSize(1)))
+    		  .andExpect(jsonPath("$.authorities[0]", is(role)));
+    }
 	
     @Test
     public void testGetMe() throws Exception {
@@ -62,71 +75,13 @@ public class IdentityControllerTest {
         		  .andExpect(jsonPath("$.authorities",
         				  containsInAnyOrder("COMPANY", "COMPANY.EDIT", "COMPANY.CREATE", "USER", "USER.EDIT", "USER.CREATE")));
         
-        mockMvc.perform(
-    			get("/me")
-    			.with(httpBasic("Company","password"))
-    		)
-            .andExpect(status().isOk())
-              .andExpect(content().contentType(contentType))
-              .andExpect(jsonPath("$.id").exists())
-              .andExpect(jsonPath("$.username", is("Company")))
-    		  .andExpect(jsonPath("$.authorities", hasSize(1)))
-    		  .andExpect(jsonPath("$.authorities[0]", is("COMPANY")));
-        
-        mockMvc.perform(
-    			get("/me")
-    			.with(httpBasic("CompanyEdit","password"))
-    		)
-            .andExpect(status().isOk())
-              .andExpect(content().contentType(contentType))
-              .andExpect(jsonPath("$.id").exists())
-              .andExpect(jsonPath("$.username", is("CompanyEdit")))
-    		  .andExpect(jsonPath("$.authorities", hasSize(1)))
-    		  .andExpect(jsonPath("$.authorities[0]", is("COMPANY.EDIT")));
-        
-        mockMvc.perform(
-    			get("/me")
-    			.with(httpBasic("CompanyCreate","password"))
-    		)
-            .andExpect(status().isOk())
-              .andExpect(content().contentType(contentType))
-              .andExpect(jsonPath("$.id").exists())
-              .andExpect(jsonPath("$.username", is("CompanyCreate")))
-    		  .andExpect(jsonPath("$.authorities", hasSize(1)))
-    		  .andExpect(jsonPath("$.authorities[0]", is("COMPANY.CREATE")));
-        
-        mockMvc.perform(
-    			get("/me")
-    			.with(httpBasic("User","password"))
-    		)
-            .andExpect(status().isOk())
-              .andExpect(content().contentType(contentType))
-              .andExpect(jsonPath("$.id").exists())
-              .andExpect(jsonPath("$.username", is("User")))
-    		  .andExpect(jsonPath("$.authorities", hasSize(1)))
-    		  .andExpect(jsonPath("$.authorities[0]", is("USER")));
-        
-        mockMvc.perform(
-    			get("/me")
-    			.with(httpBasic("UserEdit","password"))
-    		)
-            .andExpect(status().isOk())
-              .andExpect(content().contentType(contentType))
-              .andExpect(jsonPath("$.id").exists())
-              .andExpect(jsonPath("$.username", is("UserEdit")))
-    		  .andExpect(jsonPath("$.authorities", hasSize(1)))
-    		  .andExpect(jsonPath("$.authorities[0]", is("USER.EDIT")));
-        
-        mockMvc.perform(
-    			get("/me")
-    			.with(httpBasic("UserCreate","password"))
-    		)
-            .andExpect(status().isOk())
-              .andExpect(content().contentType(contentType))
-              .andExpect(jsonPath("$.id").exists())
-              .andExpect(jsonPath("$.username", is("UserCreate")))
-    		  .andExpect(jsonPath("$.authorities", hasSize(1)))
-    		  .andExpect(jsonPath("$.authorities[0]", is("USER.CREATE")));
+        performGetMeForUsersWithOneRole("Company", "COMPANY");
+        performGetMeForUsersWithOneRole("CompanyEdit", "COMPANY.EDIT");
+        performGetMeForUsersWithOneRole("CompanyCreate", "COMPANY.CREATE");
+        performGetMeForUsersWithOneRole("User", "USER");
+        performGetMeForUsersWithOneRole("UserEdit", "USER.EDIT");
+        performGetMeForUsersWithOneRole("UserCreate", "USER.CREATE");
+
     }
     
     @Test
