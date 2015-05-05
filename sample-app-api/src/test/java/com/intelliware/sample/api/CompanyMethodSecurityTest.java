@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -34,8 +35,8 @@ import com.intelliware.sample.vo.CompanyVO;
 public class CompanyMethodSecurityTest {
 	
     private MockMvc mockMvc;
-    private List<Company> companyList = new ArrayList<>();
-    private Company company;
+    private String companyId;
+    private CompanyVO requestBody = TestUtils.createMyCompanyVO();
     
     @Autowired
     private CompanyRepository companyRepository;
@@ -54,127 +55,127 @@ public class CompanyMethodSecurityTest {
         
         companyRepository.deleteAll();
         
-        company = new Company();
+        Company company = new Company();
         company.setName("Résumé");
         company.setPhone("+1 (828) 533-2655");
         company.setAddress("200 Adelaide W, Toronto, ON M5H 1W7");
         company.setContactEmail("karyn.porter@stelaecor.com");
         company.setContactFirstName("Karyn");
         company.setContactLastName("Porter");
+        
+        List<Company> companyList = new ArrayList<>();
         companyList.add(companyRepository.save(company));
-        company = companyList.get(0);
+        companyId = String.valueOf(companyList.get(0).getId());
+        
+        requestBody = TestUtils.createMyCompanyVO();
+        
     }
     
 
-	private void performGetCompanies(String username, ResultMatcher expectedStatus) throws Exception {
-		mockMvc.perform(
+	private void performGetCompanies(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
+		for (String username : usernames){
+			mockMvc.perform(
         			get("/companies")
         			.with(httpBasic(username, "password"))
         			)
                 .andExpect(expectedStatus);
+		}
 	}
 	
-	private void performGetCompany(String username, ResultMatcher expectedStatus) throws Exception {
-		String companyId = String.valueOf(company.getId());
-		mockMvc.perform(
-        			get("/companies/" + companyId)
-        			.with(httpBasic(username, "password"))
-        			)
-                .andExpect(expectedStatus);
+	private void performGetCompany(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
+		for (String username : usernames) {
+			mockMvc.perform(
+					get("/companies/" + companyId).with(
+							httpBasic(username, "password"))).andExpect(
+					expectedStatus);
+		}
 	}
 	
     
-    private void performAddCompany(String username, ResultMatcher expectedStatus) throws Exception {
-        CompanyVO requestBody = TestUtils.createMyCompanyVO();
-    	mockMvc.perform(
-    			post("/companies")
-    			.with(httpBasic(username,"password"))
-    			.content(TestUtils.asJsonString(requestBody))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(expectedStatus);
+    private void performAddCompany(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
+        for (String username : usernames) {
+	    	mockMvc.perform(
+	    			post("/companies")
+	    			.with(httpBasic(username,"password"))
+	    			.content(TestUtils.asJsonString(requestBody))
+	    			.contentType(MediaType.APPLICATION_JSON)
+	    			.accept(MediaType.APPLICATION_JSON)
+	    			)
+	    	  .andExpect(expectedStatus);
+        }
 	}
     
-    private void performUpdatecompany(String username, ResultMatcher expectedStatus) throws Exception{
-        	String companyId = String.valueOf(company.getId());  	
-            CompanyVO requestBody = TestUtils.createMyCompanyVO();
-        	mockMvc.perform(
-        			put("/companies/" + companyId)
-        			.with(httpBasic(username,"password"))
-        			.content(TestUtils.asJsonString(requestBody))
-        			.contentType(MediaType.APPLICATION_JSON)
-        			.accept(MediaType.APPLICATION_JSON)
-        			)
-        	  .andExpect(expectedStatus);
+    private void performUpdatecompany(List<String> usernames, ResultMatcher expectedStatus) throws Exception{	
+            for (String username : usernames) {
+	        	mockMvc.perform(
+	        			put("/companies/" + companyId)
+	        			.with(httpBasic(username,"password"))
+	        			.content(TestUtils.asJsonString(requestBody))
+	        			.contentType(MediaType.APPLICATION_JSON)
+	        			.accept(MediaType.APPLICATION_JSON)
+	        			)
+	        	  .andExpect(expectedStatus);
+            }
     }
     
-    private void performDeleteCompany(String username, ResultMatcher expectedStatus) throws Exception {
-    	String companyToDeleteId = String.valueOf(company.getId());
-    	mockMvc.perform(
-    			delete("/companies/" + companyToDeleteId)
-    		    .with(httpBasic(username,"password"))
-    		    )
-    			.andExpect(expectedStatus);
+    private void performDeleteCompany(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
+ 
+    	for (String username : usernames) {
+	    	mockMvc.perform(
+	    			delete("/companies/" + companyId)
+	    		    .with(httpBasic(username,"password"))
+	    		    )
+	    			.andExpect(expectedStatus);
+    	}
 	}
     
     @Test
     public void testGetCompanies_Authorized() throws Exception {
-    	performGetCompanies("Company", status().isOk());
-    	performGetCompanies("CompanyEdit", status().isOk());
-        performGetCompanies("CompanyCreate", status().isOk());
+    	performGetCompanies(Arrays.asList("Company", "CompanyEdit", "CompanyCreate"), status().isOk());
     }
 
     @Test
     public void testGetCompanies_NotAuthorized() throws Exception {
-    	performGetCompanies("User", status().is(403));
+    	performGetCompanies(Arrays.asList("User"), status().is(403));
     }
     
     @Test
     public void testGetCompany_Authorized() throws Exception {  	
-    	performGetCompany("Company", status().isOk());
-    	performGetCompany("CompanyEdit", status().isOk());
-    	performGetCompany("CompanyCreate", status().isOk());
+    	performGetCompany(Arrays.asList("Company", "CompanyEdit", "CompanyCreate"), status().isOk());
     }
 
 	@Test
     public void testGetCompany_NotAuthorized() throws Exception {
-    	performGetCompany("User", status().is(403));
+    	performGetCompany(Arrays.asList("User"), status().is(403));
     }
     
     @Test
     public void testAddCompany_Authorized() throws Exception {
-        performAddCompany("CompanyCreate", status().isOk());
+        performAddCompany(Arrays.asList("CompanyCreate"), status().isOk());
     }
 
 	@Test
     public void testAddCompany_NotAuthorized() throws Exception {
-        performAddCompany("CompanyEdit", status().is(403));
-        performAddCompany("Company", status().is(403));
-        performAddCompany("User", status().is(403));
+        performAddCompany(Arrays.asList("CompanyEdit", "Company", "User"), status().is(403));
     }
     
 	@Test
     public void testUpdateCompany_Authorized() throws Exception {
-        performUpdatecompany("CompanyEdit", status().isOk());
-        performUpdatecompany("CompanyCreate", status().isOk());
+        performUpdatecompany(Arrays.asList("CompanyEdit", "CompanyCreate"), status().isOk());
     }
     
 	@Test
 	public void testUpdateCompany_NotAuthorized() throws Exception {
-		performUpdatecompany("Company", status().is(403));
-		performUpdatecompany("User", status().is(403));
+		performUpdatecompany(Arrays.asList("Company", "User"), status().is(403));
     }
     
     @Test
     public void testDeleteCompany_Authorized() throws Exception {
-    	performDeleteCompany("CompanyCreate", status().is(204));
+    	performDeleteCompany(Arrays.asList("CompanyCreate"), status().is(204));
     }
 
 	@Test
     public void testDeleteCompany_NotAuthorized() throws Exception {
-		performDeleteCompany("CompanyEdit",status().is(403));
-		performDeleteCompany("Company",status().is(403));
-		performDeleteCompany("User",status().is(403));
+		performDeleteCompany(Arrays.asList("CompanyEdit", "Company", "User"),status().is(403));
     }
 }

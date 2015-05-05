@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.google.common.collect.Lists;
 import com.intelliware.sample.api.dao.UserRepository;
 import com.intelliware.sample.api.model.User;
 import com.intelliware.sample.vo.UserVO;
@@ -36,7 +37,9 @@ import com.intelliware.sample.vo.UserVO;
 public class UserMethodSecurityTest {
 	
 	private MockMvc mockMvc;
-	private User user;
+	private List<User> userList;
+	private String userId;
+	private UserVO requestBody = TestUtils.createMyUserVO();
     
     @Autowired
     private UserRepository userRepository;
@@ -59,7 +62,6 @@ public class UserMethodSecurityTest {
 	}
     
     private void performGetUser(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
-    	String userId = String.valueOf(user.getId());
     	for (String username : usernames){
 	        mockMvc.perform(
 	        		get("/users/" + userId)
@@ -70,7 +72,6 @@ public class UserMethodSecurityTest {
 	}
     
     private void performAddUser(List<String> usernames, ResultMatcher expectedStatus) throws Exception{
-    	UserVO requestBody = TestUtils.createMyUserVO();
 		for (String username : usernames){
 	    	mockMvc.perform(
 	    			post("/users")
@@ -84,8 +85,6 @@ public class UserMethodSecurityTest {
 	}
     
     private void performUpdateUser(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
-    	String userId = String.valueOf(user.getId());
-    	UserVO requestBody = TestUtils.createMyUserVO();
     	for (String username : usernames){
         	mockMvc.perform(
         			put("/users/" + userId)
@@ -99,11 +98,10 @@ public class UserMethodSecurityTest {
 	}
     
     private void performDeleteUser(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
-    	String userId = String.valueOf(user.getId());
-    	UserVO requestBody = TestUtils.createMyUserVO();
+    	String userToDeleteId = String.valueOf(userList.get(2).getId());
     	for (String username : usernames){
         	mockMvc.perform(
-        			delete("/users/" + userId)
+        			delete("/users/" + userToDeleteId)
         			.with(httpBasic(username,"password"))
         			.content(TestUtils.asJsonString(requestBody))
         			.contentType(MediaType.APPLICATION_JSON)
@@ -120,8 +118,8 @@ public class UserMethodSecurityTest {
         		.build();
         
         Iterator<User> userIter = userRepository.findAll().iterator();
-        userIter.next();
-        user = userIter.next();
+        userList = Lists.newArrayList(userIter);
+        userId = String.valueOf(userList.get(1).getId());
     }
 
     @Test
