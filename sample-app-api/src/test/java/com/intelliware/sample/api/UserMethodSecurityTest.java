@@ -4,6 +4,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -214,6 +215,56 @@ public class UserMethodSecurityTest {
     	
     	mockMvc.perform(
     			put("/users/" + userId)
+    			.with(httpBasic("Company","password"))
+    			.content(TestUtils.asJsonString(userVO))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().is(403));
+    }
+    
+    @Test
+    public void testDeleteUser_Authorized() throws Exception {
+    	
+    	String userId = String.valueOf(user.getId());
+    	UserVO userVO = TestUtils.createMyUserVO();
+
+    	mockMvc.perform(
+    			delete("/users/" + userId)
+    			.with(httpBasic("UserCreate","password"))
+    			.content(TestUtils.asJsonString(userVO))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().is(204));
+    }
+    
+    @Test
+    public void testDeleteUser_NotAuthorized() throws Exception {
+    	
+    	String userId = String.valueOf(user.getId());
+    	UserVO userVO = TestUtils.createMyUserVO();
+
+    	mockMvc.perform(
+    			delete("/users/" + userId)
+    			.with(httpBasic("UserEdit","password"))
+    			.content(TestUtils.asJsonString(userVO))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().is(403));
+    	
+    	mockMvc.perform(
+    			delete("/users/" + userId)
+    			.with(httpBasic("User","password"))
+    			.content(TestUtils.asJsonString(userVO))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().is(403));
+    	
+    	mockMvc.perform(
+    			delete("/users/" + userId)
     			.with(httpBasic("Company","password"))
     			.content(TestUtils.asJsonString(userVO))
     			.contentType(MediaType.APPLICATION_JSON)

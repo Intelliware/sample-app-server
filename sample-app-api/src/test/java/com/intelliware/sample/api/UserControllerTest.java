@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -486,6 +487,31 @@ public class UserControllerTest {
         		.accept(MediaType.APPLICATION_JSON)
         		)
                 .andExpect(status().is(404));
+    }
+    
+    @Test
+    public void testDeleteUser() throws Exception {
+    	
+    	User userToDelete = userList.get(1);
+    	String userToDeleteId = String.valueOf(userToDelete.getId());
+    	
+    	mockMvc.perform(
+    			delete("/users/" + userToDeleteId)
+    		    .with(httpBasic("a","password"))
+    		    )
+    			.andExpect(status().is(204));
+    	
+    	assertEquals(4, userRepository.count());
+    }
+    
+    @Test
+    public void testDeleteUser_NotFound() throws Exception {
+    	
+    	mockMvc.perform(
+    			delete("/users/10000")
+    			.with(httpBasic("a","password"))
+    			)
+    			.andExpect(status().is(404));
     }
 
 }
