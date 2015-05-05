@@ -106,6 +106,7 @@ public class CompanyController {
 	@Transactional
 	@PreAuthorize("hasRole('COMPANY.CREATE')")
 	@RequestMapping(value="/companies", method=RequestMethod.POST, consumes="application/json;charset=UTF-8")
+	@ResponseStatus(HttpStatus.CREATED)
 	public CompanyVO addCompany(@RequestBody CompanyVO inputCompany) {
 		Company company = createCompany(inputCompany);
 		companyDao.save(company);
