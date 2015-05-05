@@ -21,6 +21,7 @@ import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.intelliware.sample.api.dao.CompanyRepository;
@@ -64,216 +65,116 @@ public class CompanyMethodSecurityTest {
         company = companyList.get(0);
     }
     
+
+	private void performGetCompanies(String username, ResultMatcher expectedStatus) throws Exception {
+		mockMvc.perform(
+        			get("/companies")
+        			.with(httpBasic(username, "password"))
+        			)
+                .andExpect(expectedStatus);
+	}
+	
+	private void performGetCompany(String username, ResultMatcher expectedStatus) throws Exception {
+		String companyId = String.valueOf(company.getId());
+		mockMvc.perform(
+        			get("/companies/" + companyId)
+        			.with(httpBasic(username, "password"))
+        			)
+                .andExpect(expectedStatus);
+	}
+	
+    
+    private void performAddCompany(String username, ResultMatcher expectedStatus) throws Exception {
+        CompanyVO requestBody = TestUtils.createMyCompanyVO();
+    	mockMvc.perform(
+    			post("/companies")
+    			.with(httpBasic(username,"password"))
+    			.content(TestUtils.asJsonString(requestBody))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(expectedStatus);
+	}
+    
+    private void performUpdatecompany(String username, ResultMatcher expectedStatus) throws Exception{
+        	String companyId = String.valueOf(company.getId());  	
+            CompanyVO requestBody = TestUtils.createMyCompanyVO();
+        	mockMvc.perform(
+        			put("/companies/" + companyId)
+        			.with(httpBasic(username,"password"))
+        			.content(TestUtils.asJsonString(requestBody))
+        			.contentType(MediaType.APPLICATION_JSON)
+        			.accept(MediaType.APPLICATION_JSON)
+        			)
+        	  .andExpect(expectedStatus);
+    }
+    
+    private void performDeleteCompany(String username, ResultMatcher expectedStatus) throws Exception {
+    	String companyToDeleteId = String.valueOf(company.getId());
+    	mockMvc.perform(
+    			delete("/companies/" + companyToDeleteId)
+    		    .with(httpBasic(username,"password"))
+    		    )
+    			.andExpect(expectedStatus);
+	}
+    
     @Test
     public void testGetCompanies_Authorized() throws Exception {
-    	
-        mockMvc.perform(
-        			get("/companies")
-        			.with(httpBasic("Company","password"))
-        			)
-                .andExpect(status().isOk());
-        
-        mockMvc.perform(
-    			get("/companies")
-    			.with(httpBasic("CompanyEdit","password"))
-    			)
-            .andExpect(status().isOk());
-        
-        mockMvc.perform(
-    			get("/companies")
-    			.with(httpBasic("CompanyCreate","password"))
-    			)
-            .andExpect(status().isOk());
+    	performGetCompanies("Company", status().isOk());
+    	performGetCompanies("CompanyEdit", status().isOk());
+        performGetCompanies("CompanyCreate", status().isOk());
     }
-    
+
     @Test
     public void testGetCompanies_NotAuthorized() throws Exception {
-    	
-        mockMvc.perform(
-        			get("/companies")
-        			.with(httpBasic("User","password"))
-        			)
-                .andExpect(status().is(403));
+    	performGetCompanies("User", status().is(403));
     }
     
     @Test
-    public void testGetCompany_Authorized() throws Exception {
-    	
-    	String companyId = String.valueOf(company.getId());
-    	
-        mockMvc.perform(
-        		get("/companies/" + companyId)
-        		.with(httpBasic("Company","password"))
-        		)
-                .andExpect(status().isOk());
-        
-        mockMvc.perform(
-        		get("/companies/" + companyId)
-        		.with(httpBasic("CompanyEdit","password"))
-        		)
-                .andExpect(status().isOk());
-        
-        mockMvc.perform(
-        		get("/companies/" + companyId)
-        		.with(httpBasic("CompanyCreate","password"))
-        		)
-                .andExpect(status().isOk());
+    public void testGetCompany_Authorized() throws Exception {  	
+    	performGetCompany("Company", status().isOk());
+    	performGetCompany("CompanyEdit", status().isOk());
+    	performGetCompany("CompanyCreate", status().isOk());
     }
-    
-    @Test
+
+	@Test
     public void testGetCompany_NotAuthorized() throws Exception {
-    	
-    	String companyId = String.valueOf(company.getId());
-    	
-        mockMvc.perform(
-        		get("/companies/" + companyId)
-        		.with(httpBasic("User","password"))
-        		)
-                .andExpect(status().is(403));
+    	performGetCompany("User", status().is(403));
     }
     
     @Test
     public void testAddCompany_Authorized() throws Exception {
-    	
-        CompanyVO companyVO = TestUtils.createMyCompanyVO();
-
-    	mockMvc.perform(
-    			post("/companies")
-    			.with(httpBasic("CompanyCreate","password"))
-    			.content(TestUtils.asJsonString(companyVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().isOk());
+        performAddCompany("CompanyCreate", status().isOk());
     }
-    
-    @Test
+
+	@Test
     public void testAddCompany_NotAuthorized() throws Exception {
-    	
-        CompanyVO companyVO = TestUtils.createMyCompanyVO();
-
-    	mockMvc.perform(
-    			post("/companies")
-    			.with(httpBasic("CompanyEdit","password"))
-    			.content(TestUtils.asJsonString(companyVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().is(403));
-    	
-    	mockMvc.perform(
-    			post("/companies")
-    			.with(httpBasic("Company","password"))
-    			.content(TestUtils.asJsonString(companyVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().is(403));
-    	
-    	mockMvc.perform(
-    			post("/companies")
-    			.with(httpBasic("User","password"))
-    			.content(TestUtils.asJsonString(companyVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().is(403));
+        performAddCompany("CompanyEdit", status().is(403));
+        performAddCompany("Company", status().is(403));
+        performAddCompany("User", status().is(403));
     }
     
+	@Test
     public void testUpdateCompany_Authorized() throws Exception {
-    	
-    	String companyToUpdateId = String.valueOf(company.getId());
-    	
-        CompanyVO company = TestUtils.createMyCompanyVO();
-
-    	mockMvc.perform(
-    			put("/companies/" + companyToUpdateId)
-    			.with(httpBasic("CompanyEdit","password"))
-    			.content(TestUtils.asJsonString(company))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().isOk());
-    	
-    	mockMvc.perform(
-    			put("/companies/" + companyToUpdateId)
-    			.with(httpBasic("CompanyCreate","password"))
-    			.content(TestUtils.asJsonString(company))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().isOk());
-        
+        performUpdatecompany("CompanyEdit", status().isOk());
+        performUpdatecompany("CompanyCreate", status().isOk());
     }
     
-    public void testUpdateCompany_NotAuthorized() throws Exception {
-    	
-    	String companyToUpdateId = String.valueOf(company.getId());
-    	
-        CompanyVO company = TestUtils.createMyCompanyVO();
-
-    	mockMvc.perform(
-    			put("/companies/" + companyToUpdateId)
-    			.with(httpBasic("Company","password"))
-    			.content(TestUtils.asJsonString(company))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().is(403));
-    	
-    	mockMvc.perform(
-    			put("/companies/" + companyToUpdateId)
-    			.with(httpBasic("User","password"))
-    			.content(TestUtils.asJsonString(company))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().is(403));
-        
+	@Test
+	public void testUpdateCompany_NotAuthorized() throws Exception {
+		performUpdatecompany("Company", status().is(403));
+		performUpdatecompany("User", status().is(403));
     }
     
     @Test
     public void testDeleteCompany_Authorized() throws Exception {
-    	
-    	String companyToDeleteId = String.valueOf(company.getId());
-    	
-    	mockMvc.perform(
-    			delete("/companies/" + companyToDeleteId)
-    		    .with(httpBasic("CompanyCreate","password"))
-    		    )
-    			.andExpect(status().is(204));
-    	
+    	performDeleteCompany("CompanyCreate", status().is(204));
     }
-    
-    @Test
-    public void testDeleteCompany_NotAuthorized() throws Exception {
-    	
-    	String companyToDeleteId = String.valueOf(company.getId());
-    	
-    	mockMvc.perform(
-    			delete("/companies/" + companyToDeleteId)
-    		    .with(httpBasic("CompanyEdit","password"))
-    		    )
-    			.andExpect(status().is(403));
-    	
-    	mockMvc.perform(
-    			delete("/companies/" + companyToDeleteId)
-    		    .with(httpBasic("Company","password"))
-    		    )
-    			.andExpect(status().is(403));
-    	
-    	mockMvc.perform(
-    			delete("/companies/" + companyToDeleteId)
-    		    .with(httpBasic("User","password"))
-    		    )
-    			.andExpect(status().is(403));
-    	
-    }
-    
-    
-    
-    
-    
-    
 
+	@Test
+    public void testDeleteCompany_NotAuthorized() throws Exception {
+		performDeleteCompany("CompanyEdit",status().is(403));
+		performDeleteCompany("Company",status().is(403));
+		performDeleteCompany("User",status().is(403));
+    }
 }
