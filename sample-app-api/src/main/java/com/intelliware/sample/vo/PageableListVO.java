@@ -11,7 +11,12 @@ public class PageableListVO<T> {
 
 	public PageableListVO(List<T> resultList) {
 		this.elements = resultList;
-		this._metadata = new MetadataVO(resultList.size());
+		this._metadata = new MetadataVO(Long.valueOf(resultList.size()));
+	}
+
+	public PageableListVO(List<T> resultList, long totalElements) {
+		this.elements = resultList;
+		this._metadata = new MetadataVO(totalElements);
 	}
 
 	public List<T> getElements() {

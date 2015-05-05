@@ -298,7 +298,7 @@ public class UserControllerTest {
                 .andExpect(content().contentType(contentType))
                 .andExpect(content().contentType(contentType))
 	      		  .andExpect(jsonPath("$.elements", hasSize(2)))
-	      		  .andExpect(jsonPath("$._metadata.totalElements", is(2)))
+	      		  .andExpect(jsonPath("$._metadata.totalElements", is(5)))
 				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(user3.getId()))))
 				  .andExpect(jsonPath("$.elements[0].name", is(user3.getName())))
 				  .andExpect(jsonPath("$.elements[0].email", is(user3.getEmail())))
@@ -319,7 +319,7 @@ public class UserControllerTest {
                 .andExpect(content().contentType(contentType))
                 .andExpect(content().contentType(contentType))
 	      		  .andExpect(jsonPath("$.elements", hasSize(1)))
-	      		  .andExpect(jsonPath("$._metadata.totalElements", is(1)))
+	      		  .andExpect(jsonPath("$._metadata.totalElements", is(5)))
 				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(user5.getId()))))
 				  .andExpect(jsonPath("$.elements[0].name", is(user5.getName())))
 				  .andExpect(jsonPath("$.elements[0].email", is(user5.getEmail())));
@@ -336,7 +336,7 @@ public class UserControllerTest {
                 .andExpect(content().contentType(contentType))
                 .andExpect(content().contentType(contentType))
 	      		  .andExpect(jsonPath("$.elements", hasSize(0)))
-	      		  .andExpect(jsonPath("$._metadata.totalElements", is(0)));
+	      		  .andExpect(jsonPath("$._metadata.totalElements", is(5)));
     }
     
     @Test
@@ -353,7 +353,7 @@ public class UserControllerTest {
                 .andExpect(content().contentType(contentType))
                 .andExpect(content().contentType(contentType))
 	      		  .andExpect(jsonPath("$.elements", hasSize(2)))
-	      		  .andExpect(jsonPath("$._metadata.totalElements", is(2)))
+	      		  .andExpect(jsonPath("$._metadata.totalElements", is(5)))
 				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(user5.getId()))))
 				  .andExpect(jsonPath("$.elements[0].name", is(user5.getName())))
 				  .andExpect(jsonPath("$.elements[0].email", is(user5.getEmail())))
@@ -375,7 +375,7 @@ public class UserControllerTest {
                 .andExpect(content().contentType(contentType))
                 .andExpect(content().contentType(contentType))
         		  .andExpect(jsonPath("$.elements", hasSize(1)))
-        		  .andExpect(jsonPath("$._metadata.totalElements", is(1)))
+        		  .andExpect(jsonPath("$._metadata.totalElements", is(3)))
 				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(user3.getId()))))
 				  .andExpect(jsonPath("$.elements[0].name", is(user3.getName())))
 				  .andExpect(jsonPath("$.elements[0].email", is(user3.getEmail())));
@@ -395,7 +395,7 @@ public class UserControllerTest {
                 .andExpect(content().contentType(contentType))
                 .andExpect(content().contentType(contentType))
         		  .andExpect(jsonPath("$.elements", hasSize(2)))
-        		  .andExpect(jsonPath("$._metadata.totalElements", is(2)))
+        		  .andExpect(jsonPath("$._metadata.totalElements", is(3)))
 				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(user5.getId()))))
 				  .andExpect(jsonPath("$.elements[0].name", is(user5.getName())))
 				  .andExpect(jsonPath("$.elements[0].email", is(user5.getEmail())))

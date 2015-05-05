@@ -2,17 +2,17 @@ package com.intelliware.sample.vo;
 
 public class MetadataVO {
 
-	private int totalElements;
+	private Long totalElements;
 
-	public MetadataVO(int size) {
-		this.totalElements = size;
+	public MetadataVO(Long totalElements) {
+		this.totalElements = totalElements;
 	}
 
-	public int getTotalElements() {
+	public Long getTotalElements() {
 		return totalElements;
 	}
 
-	public void setTotalElements(int totalElements) {
+	public void setTotalElements(Long totalElements) {
 		this.totalElements = totalElements;
 	}
 	

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -28,19 +29,16 @@ public class UserController {
 	@Autowired
 	private UserRepository userDao;
 	
-	private Iterable<User> retrieveUsers(String nameToFilterBy, String orderProperty, Integer page, Integer pageSize) {
-		Sort sort = orderProperty == null ? null : new Sort(Sort.Direction.ASC, orderProperty);
-		PageRequest pageRequest = page == null || pageSize == null ? null :
-								  	new PageRequest(page - 1, pageSize, sort); //subtract 1 because pageRequest is 0 based		
-		if (nameToFilterBy != null){
-			String filterString = "%" + nameToFilterBy + "%";
-			return pageRequest != null ? userDao.findByNameLikeIgnoreCase(filterString, pageRequest) : 
-										 userDao.findByNameLikeIgnoreCase(filterString, sort);
+	private List<UserVO> convertToUserVOList(Iterable<User> users) {
+		List<UserVO> userVOList = new ArrayList<UserVO>();
+		for (User user : users){
+			userVOList.add(convertToUserVO(user));
 		}
-		if (pageRequest != null){
-			return userDao.findAll(pageRequest);
-		}	
-		return userDao.findAll(sort); //sort can be null
+		return userVOList;
+	}
+
+	private Sort getSort(String orderProperty) {
+		return orderProperty == null ? null : new Sort(Sort.Direction.ASC, orderProperty);
 	}
 	
 	private User findUser(String id) throws UserNotFoundException {
@@ -50,7 +48,6 @@ public class UserController {
 		}
 		return user;
 	}
-	
 
 	private User createUser(UserVO inputUser) {
 		User newUser = new User();
@@ -71,20 +68,48 @@ public class UserController {
 		return userVO;
 	}
 	
+	public String getFilterString(String nameToFilterBy){
+		return new StringBuilder().append("%").append(nameToFilterBy).append("%").toString();
+	}
+	
+	public PageableListVO<UserVO> getUsersNotPaginated(String nameToFilterBy, String orderProperty){	
+		Sort sort = getSort(orderProperty);
+		
+		Iterable<User> users = nameToFilterBy == null ? 
+				userDao.findAll(sort) : //sort can be null;
+				userDao.findByNameLikeIgnoreCase(getFilterString(nameToFilterBy), sort);
+	
+		List<UserVO> userVOList = convertToUserVOList(users);
+		return new PageableListVO<UserVO>(userVOList);
+	}
+
+	
+	public PageableListVO<UserVO> getUsersPaginated(String nameToFilterBy, String orderProperty, Integer page, Integer pageSize){
+		Sort sort = getSort(orderProperty);
+		PageRequest pageRequest = new PageRequest(page - 1, pageSize, sort); //subtract 1 because pageRequest is 0 based
+		
+		Page<User> users = nameToFilterBy == null ? 
+				userDao.findAll(pageRequest) :
+				userDao.findByNameLikeIgnoreCase(getFilterString(nameToFilterBy), pageRequest);
+				
+		List<UserVO> userVOList = convertToUserVOList(users);
+		return new PageableListVO<UserVO>(userVOList, users.getTotalElements());
+	}
+	
 	@Transactional
 	@PreAuthorize("hasAnyRole('USER.CREATE', 'USER.EDIT', 'USER')")
 	@RequestMapping(value="/users", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
 	public PageableListVO<UserVO> getUsers(@RequestParam(required = false, value="name") String nameToFilterBy,
 										   @RequestParam(required = false, value="_orderBy") String orderProperty,
 										   @RequestParam(required = false, value="_pageNumber") Integer page,
-										   @RequestParam(required = false, value="_pageSize") Integer pageSize) {		
-		Iterable<User> users = retrieveUsers(nameToFilterBy, orderProperty, page, pageSize);
-		List<UserVO> userVOList = new ArrayList<UserVO>();
-		for (User user : users){
-			userVOList.add(convertToUserVO(user));
+										   @RequestParam(required = false, value="_pageSize") Integer pageSize) {
+		if (page == null || pageSize == null){
+			return getUsersNotPaginated(nameToFilterBy, orderProperty);
+		} else {
+			return getUsersPaginated(nameToFilterBy, orderProperty, page, pageSize);
 		}
-		return new PageableListVO<UserVO>(userVOList);
 	}
+
 	
 	@Transactional
 	@PreAuthorize("hasAnyRole('USER.CREATE', 'USER.EDIT', 'USER')")
