@@ -101,6 +101,8 @@ public class UserController {
 		return convertToUserVO(user);
 	}
 	
+	@Transactional
+	@PreAuthorize("hasAnyRole('USER.CREATE', 'USER.EDIT')")
 	@RequestMapping(value="/users/{id}", method=RequestMethod.PUT, consumes="application/json;charset=UTF-8")
 	public UserVO updateUser(@PathVariable String id, @RequestBody UserVO inputUser) throws UserNotFoundException{
 		User user = findUser(id);

@@ -473,5 +473,19 @@ public class UserControllerTest {
     	assertEquals(5, userRepository.count());
     	
     }
+    
+    @Test
+    public void testUpdateUser_NotFound() throws Exception {
+        UserVO userVO = TestUtils.createMyUserVO();
+    	
+        mockMvc.perform(
+        		put("/users/10000")
+        		.with(httpBasic("a","password"))
+        		.content(TestUtils.asJsonString(userVO))
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.accept(MediaType.APPLICATION_JSON)
+        		)
+                .andExpect(status().is(404));
+    }
 
 }

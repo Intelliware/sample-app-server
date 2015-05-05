@@ -3,6 +3,7 @@ package com.intelliware.sample.api;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -50,7 +51,8 @@ public class UserMethodSecurityTest {
         		.build();
         
         Iterator<User> userIter = userRepository.findAll().iterator();
-        user = userIter.next(); //name: A, email: firstUser@email.com
+        userIter.next();
+        user = userIter.next();
 
     }
 
@@ -162,6 +164,56 @@ public class UserMethodSecurityTest {
     	
     	mockMvc.perform(
     			post("/users")
+    			.with(httpBasic("Company","password"))
+    			.content(TestUtils.asJsonString(userVO))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().is(403));
+    }
+    
+    @Test
+    public void testUpdateUser_Authorized() throws Exception {
+    	
+    	String userId = String.valueOf(user.getId());
+    	UserVO userVO = TestUtils.createMyUserVO();
+
+    	mockMvc.perform(
+    			put("/users/" + userId)
+    			.with(httpBasic("UserCreate","password"))
+    			.content(TestUtils.asJsonString(userVO))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().isOk());
+    	
+    	mockMvc.perform(
+    			put("/users/" + userId)
+    			.with(httpBasic("UserEdit","password"))
+    			.content(TestUtils.asJsonString(userVO))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().isOk());
+    }
+    
+    @Test
+    public void testUpdateUser_NotAuthorized() throws Exception {
+    	
+    	String userId = String.valueOf(user.getId());
+    	UserVO userVO = TestUtils.createMyUserVO();
+
+    	mockMvc.perform(
+    			put("/users/" + userId)
+    			.with(httpBasic("User","password"))
+    			.content(TestUtils.asJsonString(userVO))
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().is(403));
+    	
+    	mockMvc.perform(
+    			put("/users/" + userId)
     			.with(httpBasic("Company","password"))
     			.content(TestUtils.asJsonString(userVO))
     			.contentType(MediaType.APPLICATION_JSON)
