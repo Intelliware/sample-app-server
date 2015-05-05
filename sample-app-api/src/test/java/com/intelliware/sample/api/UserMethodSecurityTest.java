@@ -8,7 +8,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +22,7 @@ import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.intelliware.sample.api.dao.UserRepository;
@@ -43,8 +46,73 @@ public class UserMethodSecurityTest {
     
     @Autowired
     private FilterChainProxy springSecurityFilterChain;
+
     
+    private void performGetUsers(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
+    	for (String username : usernames){
+	        mockMvc.perform(
+	    			get("/users")
+	    			.with(httpBasic(username,"password"))
+	    			)
+	            .andExpect(expectedStatus);
+    	}
+	}
     
+    private void performGetUser(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
+    	String userId = String.valueOf(user.getId());
+    	for (String username : usernames){
+	        mockMvc.perform(
+	        		get("/users/" + userId)
+	        		.with(httpBasic(username, "password"))
+	        		)
+	                .andExpect(expectedStatus);
+    	}
+	}
+    
+    private void performAddUser(List<String> usernames, ResultMatcher expectedStatus) throws Exception{
+    	UserVO requestBody = TestUtils.createMyUserVO();
+		for (String username : usernames){
+	    	mockMvc.perform(
+	    			post("/users")
+	    			.with(httpBasic(username,"password"))
+	    			.content(TestUtils.asJsonString(requestBody))
+	    			.contentType(MediaType.APPLICATION_JSON)
+	    			.accept(MediaType.APPLICATION_JSON)
+	    			)
+	    	  .andExpect(expectedStatus);
+		}
+	}
+    
+    private void performUpdateUser(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
+    	String userId = String.valueOf(user.getId());
+    	UserVO requestBody = TestUtils.createMyUserVO();
+    	for (String username : usernames){
+        	mockMvc.perform(
+        			put("/users/" + userId)
+        			.with(httpBasic(username,"password"))
+        			.content(TestUtils.asJsonString(requestBody))
+        			.contentType(MediaType.APPLICATION_JSON)
+        			.accept(MediaType.APPLICATION_JSON)
+        			)
+        	  .andExpect(expectedStatus);
+    	}
+	}
+    
+    private void performDeleteUser(List<String> usernames, ResultMatcher expectedStatus) throws Exception {
+    	String userId = String.valueOf(user.getId());
+    	UserVO requestBody = TestUtils.createMyUserVO();
+    	for (String username : usernames){
+        	mockMvc.perform(
+        			delete("/users/" + userId)
+        			.with(httpBasic(username,"password"))
+        			.content(TestUtils.asJsonString(requestBody))
+        			.contentType(MediaType.APPLICATION_JSON)
+        			.accept(MediaType.APPLICATION_JSON)
+        			)
+        	  .andExpect(expectedStatus);
+    	}
+	}
+
     @Before
     public void setup() throws Exception {
         this.mockMvc = webAppContextSetup(webApplicationContext)
@@ -54,223 +122,56 @@ public class UserMethodSecurityTest {
         Iterator<User> userIter = userRepository.findAll().iterator();
         userIter.next();
         user = userIter.next();
-
     }
 
     @Test
     public void testGetUsers_Authorized() throws Exception {
-    	
-        mockMvc.perform(
-        			get("/users")
-        			.with(httpBasic("User","password"))
-        			)
-                .andExpect(status().isOk());
-        
-        mockMvc.perform(
-    			get("/users")
-    			.with(httpBasic("UserEdit","password"))
-    			)
-            .andExpect(status().isOk());
-        
-        mockMvc.perform(
-    			get("/users")
-    			.with(httpBasic("UserCreate","password"))
-    			)
-            .andExpect(status().isOk());
+    	performGetUsers(Arrays.asList("User", "UserEdit", "UserCreate"), status().isOk());
     }
-    
-    @Test
+
+	@Test
     public void testGetUsers_NotAuthorized() throws Exception {
-    	
-        mockMvc.perform(
-        			get("/users")
-        			.with(httpBasic("Company","password"))
-        			)
-                .andExpect(status().is(403));
+		performGetUsers(Arrays.asList("Company"), status().is(403));
     }
     
     @Test
     public void testGetUser_Authorized() throws Exception {
-    	
-    	String userId = String.valueOf(user.getId());
-    	
-        mockMvc.perform(
-        		get("/users/" + userId)
-        		.with(httpBasic("User","password"))
-        		)
-                .andExpect(status().isOk());
-        
-        mockMvc.perform(
-        		get("/users/" + userId)
-        		.with(httpBasic("UserEdit","password"))
-        		)
-                .andExpect(status().isOk());
-        
-        mockMvc.perform(
-        		get("/users/" + userId)
-        		.with(httpBasic("UserCreate","password"))
-        		)
-                .andExpect(status().isOk());
+    	performGetUser(Arrays.asList("User", "UserEdit", "UserCreate"), status().isOk());
     }
-    
-    @Test
+
+	@Test
     public void testGetUser_NotAuthorized() throws Exception {
-    	
-    	String userId = String.valueOf(user.getId());
-    	
-        mockMvc.perform(
-        		get("/users/" + userId)
-        		.with(httpBasic("Company","password"))
-        		)
-                .andExpect(status().is(403));
+		performGetUser(Arrays.asList("Company"), status().is(403));
     }
     
     @Test
     public void testAddUser_Authorized() throws Exception {
-    	
-    	UserVO userVO = TestUtils.createMyUserVO();
-
-    	mockMvc.perform(
-    			post("/users")
-    			.with(httpBasic("UserCreate","password"))
-    			.content(TestUtils.asJsonString(userVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().isOk());
+    	performAddUser(Arrays.asList("UserCreate"), status().isOk());
     }
     
-    @Test
+	@Test
     public void testAddUser_NotAuthorized() throws Exception {
-    	
-    	UserVO userVO = TestUtils.createMyUserVO();
-
-    	mockMvc.perform(
-    			post("/users")
-    			.with(httpBasic("User","password"))
-    			.content(TestUtils.asJsonString(userVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().is(403));
-    	
-    	mockMvc.perform(
-    			post("/users")
-    			.with(httpBasic("UserEdit","password"))
-    			.content(TestUtils.asJsonString(userVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().is(403));
-    	
-    	mockMvc.perform(
-    			post("/users")
-    			.with(httpBasic("Company","password"))
-    			.content(TestUtils.asJsonString(userVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().is(403));
+		performAddUser(Arrays.asList("User", "UserEdit", "Company"), status().is(403));
     }
     
     @Test
     public void testUpdateUser_Authorized() throws Exception {
-    	
-    	String userId = String.valueOf(user.getId());
-    	UserVO userVO = TestUtils.createMyUserVO();
-
-    	mockMvc.perform(
-    			put("/users/" + userId)
-    			.with(httpBasic("UserCreate","password"))
-    			.content(TestUtils.asJsonString(userVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().isOk());
-    	
-    	mockMvc.perform(
-    			put("/users/" + userId)
-    			.with(httpBasic("UserEdit","password"))
-    			.content(TestUtils.asJsonString(userVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().isOk());
+    	performUpdateUser(Arrays.asList("UserCreate", "UserEdit"), status().isOk());
     }
     
-    @Test
+	@Test
     public void testUpdateUser_NotAuthorized() throws Exception {
-    	
-    	String userId = String.valueOf(user.getId());
-    	UserVO userVO = TestUtils.createMyUserVO();
-
-    	mockMvc.perform(
-    			put("/users/" + userId)
-    			.with(httpBasic("User","password"))
-    			.content(TestUtils.asJsonString(userVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().is(403));
-    	
-    	mockMvc.perform(
-    			put("/users/" + userId)
-    			.with(httpBasic("Company","password"))
-    			.content(TestUtils.asJsonString(userVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().is(403));
+		performUpdateUser(Arrays.asList("User", "Company"), status().is(403));
     }
     
     @Test
     public void testDeleteUser_Authorized() throws Exception {
-    	
-    	String userId = String.valueOf(user.getId());
-    	UserVO userVO = TestUtils.createMyUserVO();
-
-    	mockMvc.perform(
-    			delete("/users/" + userId)
-    			.with(httpBasic("UserCreate","password"))
-    			.content(TestUtils.asJsonString(userVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().is(204));
+    	performDeleteUser(Arrays.asList("UserCreate"), status().is(204));
     }
-    
-    @Test
-    public void testDeleteUser_NotAuthorized() throws Exception {
-    	
-    	String userId = String.valueOf(user.getId());
-    	UserVO userVO = TestUtils.createMyUserVO();
 
-    	mockMvc.perform(
-    			delete("/users/" + userId)
-    			.with(httpBasic("UserEdit","password"))
-    			.content(TestUtils.asJsonString(userVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().is(403));
-    	
-    	mockMvc.perform(
-    			delete("/users/" + userId)
-    			.with(httpBasic("User","password"))
-    			.content(TestUtils.asJsonString(userVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().is(403));
-    	
-    	mockMvc.perform(
-    			delete("/users/" + userId)
-    			.with(httpBasic("Company","password"))
-    			.content(TestUtils.asJsonString(userVO))
-    			.contentType(MediaType.APPLICATION_JSON)
-    			.accept(MediaType.APPLICATION_JSON)
-    			)
-    	  .andExpect(status().is(403));
+	@Test
+    public void testDeleteUser_NotAuthorized() throws Exception {
+		performDeleteUser(Arrays.asList("UserEdit", "User", "Company"), status().is(403));
     }
 	
 }
