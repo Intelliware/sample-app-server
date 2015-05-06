@@ -66,7 +66,7 @@ version: 1.0
                                   
                                       
       403:
-        description: Logged in user does not have either 'COMPANY', 'COMPANY.EDIT' or 'COMPANY.CREATE' role
+        description: Logged in user has neither 'COMPANY', 'COMPANY.EDIT' nor 'COMPANY.CREATE' role
   post:
     description: Create a new company.
     body:
@@ -125,7 +125,7 @@ version: 1.0
                       }
                 }
         403:
-          description: The logged in user does not have either 'COMPANY', 'COMPANY.EDIT' or 'COMPANY.CREATE' role
+          description: The logged in user has neither 'COMPANY', 'COMPANY.EDIT' nor 'COMPANY.CREATE' role
         404:
           body:
             application/json:
@@ -170,7 +170,7 @@ version: 1.0
                         }
                   }
         403:
-          description: The logged in user does not have either 'COMPANY.EDIT' or 'COMPANY.CREATE' role
+          description: The logged in user has neither 'COMPANY.EDIT' nor 'COMPANY.CREATE' role
         404:
           body:
             application/json:
@@ -229,7 +229,7 @@ version: 1.0
                   }
              }
       403:
-        description: Logged in user does not have either 'USER', 'USER.EDIT' or 'USER.CREATE' role
+        description: Logged in user has neither 'USER', 'USER.EDIT' nor 'USER.CREATE' role
   post:
     description: Create a new User record.
     body:
@@ -264,7 +264,7 @@ version: 1.0
                   "email": "myEmail.gmail.com"
                 }
         403:
-          description: The logged in user does not have either 'USER', 'USER.EDIT' or 'USER.CREATE' role
+          description: The logged in user has neither 'USER', 'USER.EDIT' nor 'USER.CREATE' role
         404:
           body:
             application/json:
@@ -293,7 +293,7 @@ version: 1.0
                   "email": "new@email.com"
                 }
         403:
-          description: The logged in user does not have either 'USER.EDIT' or 'USER.CREATE' role
+          description: The logged in user has neither 'USER.EDIT' nor 'USER.CREATE' role
         404:
           body:
             application/json:
@@ -306,6 +306,8 @@ version: 1.0
       description: Delete an individual User record.
       responses:
         204:
+        403:
+          description: The logged in user does not have 'USER.CREATE' role
         404:
           body:
             application/json:
