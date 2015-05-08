@@ -24,7 +24,7 @@ import com.intelliware.sample.vo.PageableListVO;
 import com.intelliware.sample.vo.UserVO;
 
 @RestController
-public class UserController {
+public class UserController implements IConstants {
 	
 	@Autowired
 	private UserRepository userDao;
@@ -98,7 +98,7 @@ public class UserController {
 	
 	@Transactional
 	@PreAuthorize("hasAnyRole('USER.CREATE', 'USER.EDIT', 'USER')")
-	@RequestMapping(value="/users", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+	@RequestMapping(value="/users", method=RequestMethod.GET, produces=IConstants.jsonUTF8)
 	public PageableListVO<UserVO> getUsers(@RequestParam(required = false, value="name") String nameToFilterBy,
 										   @RequestParam(required = false, value="_orderBy") String orderProperty,
 										   @RequestParam(required = false, value="_pageNumber") Integer page,
@@ -112,7 +112,7 @@ public class UserController {
 	
 	@Transactional
 	@PreAuthorize("hasAnyRole('USER.CREATE', 'USER.EDIT', 'USER')")
-	@RequestMapping(value="/users/{id}", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+	@RequestMapping(value="/users/{id}", method=RequestMethod.GET, produces=IConstants.jsonUTF8)
 	public UserVO getUser(@PathVariable String id) throws UserNotFoundException {		
 		User user = findUser(id);
 		return convertToUserVO(user);
@@ -120,7 +120,7 @@ public class UserController {
 	
 	@Transactional
 	@PreAuthorize("hasRole('USER.CREATE')")
-	@RequestMapping(value="/users", method=RequestMethod.POST, consumes="application/json;charset=UTF-8")
+	@RequestMapping(value="/users", method=RequestMethod.POST, consumes=IConstants.jsonUTF8)
 	@ResponseStatus(HttpStatus.CREATED)
 	public UserVO addUser(@RequestBody UserVO inputUser) {
 		User user = createUser(inputUser);
@@ -130,7 +130,7 @@ public class UserController {
 	
 	@Transactional
 	@PreAuthorize("hasAnyRole('USER.CREATE', 'USER.EDIT')")
-	@RequestMapping(value="/users/{id}", method=RequestMethod.PUT, consumes="application/json;charset=UTF-8")
+	@RequestMapping(value="/users/{id}", method=RequestMethod.PUT, consumes=IConstants.jsonUTF8)
 	public UserVO updateUser(@PathVariable String id, @RequestBody UserVO inputUser) throws UserNotFoundException{
 		User user = findUser(id);
 		setUserAttributes(inputUser, user);

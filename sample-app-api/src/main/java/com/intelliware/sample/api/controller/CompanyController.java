@@ -23,7 +23,7 @@ import com.intelliware.sample.vo.PageableListVO;
 
 
 @RestController
-public class CompanyController {
+public class CompanyController implements IConstants{
 
 	@Autowired
 	private CompanyRepository companyDao;
@@ -85,7 +85,7 @@ public class CompanyController {
 
 	@Transactional
 	@PreAuthorize("hasAnyRole('COMPANY.CREATE', 'COMPANY.EDIT', 'COMPANY')")
-	@RequestMapping(value="/companies", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+	@RequestMapping(value="/companies", method=RequestMethod.GET, produces=IConstants.jsonUTF8)
 	public PageableListVO<CompanyVO> getCompanies() {
 		Iterable<Company> companies = companyDao.findAll();
 		List<CompanyVO> companyVOList = new ArrayList<CompanyVO>();
@@ -97,7 +97,7 @@ public class CompanyController {
 	
 	@Transactional
 	@PreAuthorize("hasAnyRole('COMPANY.CREATE', 'COMPANY.EDIT', 'COMPANY')")
-	@RequestMapping(value="/companies/{id}", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+	@RequestMapping(value="/companies/{id}", method=RequestMethod.GET, produces=IConstants.jsonUTF8)
 	public CompanyVO getCompany(@PathVariable String id) {
 		Company company = findCompany(id);
 		return convertToCompanyVO(company);
@@ -105,7 +105,7 @@ public class CompanyController {
 	
 	@Transactional
 	@PreAuthorize("hasRole('COMPANY.CREATE')")
-	@RequestMapping(value="/companies", method=RequestMethod.POST, consumes="application/json;charset=UTF-8")
+	@RequestMapping(value="/companies", method=RequestMethod.POST, consumes=IConstants.jsonUTF8)
 	@ResponseStatus(HttpStatus.CREATED)
 	public CompanyVO addCompany(@RequestBody CompanyVO inputCompany) {
 		Company company = createCompany(inputCompany);
@@ -115,7 +115,7 @@ public class CompanyController {
 	
 	@Transactional
 	@PreAuthorize("hasAnyRole('COMPANY.CREATE', 'COMPANY.EDIT')")
-	@RequestMapping(value="/companies/{id}", method=RequestMethod.PUT, consumes="application/json;charset=UTF-8")
+	@RequestMapping(value="/companies/{id}", method=RequestMethod.PUT, consumes=IConstants.jsonUTF8)
 	public CompanyVO updateCompany(@PathVariable String id, @RequestBody CompanyVO inputCompany) {
 		Company company = findCompany(id);
 		setCompanyAttributes(inputCompany, company);	
