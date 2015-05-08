@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -93,6 +94,11 @@ public class IdentityControllerTest {
         		)
                 .andExpect(status().is(401));
 
+    }
+    
+    @Test
+    public void testSignOut() throws Exception {
+    	mockMvc.perform(delete("/signOut").with(httpBasic("a","password"))).andExpect(status().is(204));
     }
 
 }
