@@ -95,8 +95,8 @@ public class CompanyMethodSecurityTest {
 	    	mockMvc.perform(
 	    			post("/companies")
 	    			.with(httpBasic(username,"password"))
-	    			.content(TestUtils.asJsonString(requestBody))
-	    			.contentType(MediaType.APPLICATION_JSON)
+	    			.param("data", TestUtils.asJsonString(requestBody))
+	    			.contentType(MediaType.MULTIPART_FORM_DATA)
 	    			.accept(MediaType.APPLICATION_JSON)
 	    			)
 	    	  .andExpect(status().is(expectedStatus));
@@ -108,8 +108,8 @@ public class CompanyMethodSecurityTest {
 	        	mockMvc.perform(
 	        			put("/companies/" + companyId)
 	        			.with(httpBasic(username,"password"))
-	        			.content(TestUtils.asJsonString(requestBody))
-	        			.contentType(MediaType.APPLICATION_JSON)
+	        			.param("data", TestUtils.asJsonString(requestBody))
+	        			.contentType(MediaType.MULTIPART_FORM_DATA)
 	        			.accept(MediaType.APPLICATION_JSON)
 	        			)
 	        	  .andExpect(status().is(expectedStatus));

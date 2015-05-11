@@ -27,7 +27,7 @@ public class TestUtils {
 	        throw new RuntimeException(e);
 	    }
 	} 
-	
+
 	public static CompanyVO createMyCompanyVO() {
 		CompanyVO company = new CompanyVO();
         company.setName("My Company");

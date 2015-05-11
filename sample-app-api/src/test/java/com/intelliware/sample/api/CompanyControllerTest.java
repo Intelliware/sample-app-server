@@ -148,8 +148,8 @@ public class CompanyControllerTest {
     	mockMvc.perform(
     			post("/companies")
     			.with(httpBasic("a","password"))
-    			.content(TestUtils.asJsonString(requestBody))
-    			.contentType(MediaType.APPLICATION_JSON)
+    			.param("data", TestUtils.asJsonString(requestBody))
+    			.contentType(MediaType.MULTIPART_FORM_DATA)
     			.accept(MediaType.APPLICATION_JSON)
     			)
     	  .andExpect(status().is(201))
@@ -173,8 +173,8 @@ public class CompanyControllerTest {
     	mockMvc.perform(
     			put("/companies/" + companyToUpdateId)
     			.with(httpBasic("a","password"))
-    			.content(TestUtils.asJsonString(requestBody))
-    			.contentType(MediaType.APPLICATION_JSON)
+    			.param("data", TestUtils.asJsonString(requestBody))
+    			.contentType(MediaType.MULTIPART_FORM_DATA)
     			.accept(MediaType.APPLICATION_JSON)
     			)
     	  .andExpect(status().isOk())
@@ -195,9 +195,9 @@ public class CompanyControllerTest {
         mockMvc.perform(
         		put("/companies/10000")
         		.with(httpBasic("a","password"))
-        		.content(TestUtils.asJsonString(requestBody))
-        		.contentType(MediaType.APPLICATION_JSON)
-        		.accept(MediaType.APPLICATION_JSON)
+    			.param("data", TestUtils.asJsonString(requestBody))
+    			.contentType(MediaType.MULTIPART_FORM_DATA)
+    			.accept(MediaType.APPLICATION_JSON)
         		)
                 .andExpect(status().is(404));
     }
