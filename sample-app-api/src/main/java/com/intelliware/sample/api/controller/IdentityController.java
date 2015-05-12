@@ -3,9 +3,12 @@ package com.intelliware.sample.api.controller;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.intelliware.sample.api.model.Role;
@@ -36,5 +39,12 @@ public class IdentityController{
 	public IdentityVO getIdentity() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return createIdentityVO(user);
+	}
+	
+	@Transactional
+	@RequestMapping(value="/signOut", method=RequestMethod.DELETE)
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void logout() {
+		SecurityContextHolder.clearContext();
 	}
 }

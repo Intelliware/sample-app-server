@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +28,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
@@ -37,6 +40,8 @@ import com.intelliware.sample.vo.UserVO;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SampleAppApiApplication.class)
 @WebAppConfiguration
+@TransactionConfiguration(transactionManager="transactionManager", defaultRollback=true)
+@Transactional
 public class UserControllerTest {
 	
 	private MediaType contentType = TestUtils.getContentType();
@@ -195,7 +200,41 @@ public class UserControllerTest {
 				  .andExpect(jsonPath("$.elements[4].name", is(user4.getName())))
 				  .andExpect(jsonPath("$.elements[4].email", is(user4.getEmail())));
     }
-    
+
+    @Test
+    public void testGetUsers_OrderByName_Reverse() throws Exception {
+    	
+    	User user1 = userList.get(0);
+    	User user2 = userList.get(1);
+    	User user3 = userList.get(2);
+    	User user4 = userList.get(3);
+    	User user5 = userList.get(4);
+    	
+        mockMvc.perform(
+        			get("/users?_orderBy=name&_ascending=false")
+        			.with(httpBasic("a","password"))
+        		)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+	      		  .andExpect(jsonPath("$.elements", hasSize(5)))
+	      		  .andExpect(jsonPath("$._metadata.totalElements", is(5)))
+				  .andExpect(jsonPath("$.elements[4].id", is(String.valueOf(user1.getId()))))
+				  .andExpect(jsonPath("$.elements[4].name", is(user1.getName())))
+				  .andExpect(jsonPath("$.elements[4].email", is(user1.getEmail())))
+				  .andExpect(jsonPath("$.elements[3].id", is(String.valueOf(user2.getId()))))
+				  .andExpect(jsonPath("$.elements[3].name", is(user2.getName())))
+				  .andExpect(jsonPath("$.elements[3].email", is(user2.getEmail())))
+				  .andExpect(jsonPath("$.elements[2].id", is(String.valueOf(user5.getId()))))
+				  .andExpect(jsonPath("$.elements[2].name", is(user5.getName())))
+				  .andExpect(jsonPath("$.elements[2].email", is(user5.getEmail())))
+				  .andExpect(jsonPath("$.elements[1].id", is(String.valueOf(user3.getId()))))
+				  .andExpect(jsonPath("$.elements[1].name", is(user3.getName())))
+				  .andExpect(jsonPath("$.elements[1].email", is(user3.getEmail())))
+				  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(user4.getId()))))
+				  .andExpect(jsonPath("$.elements[0].name", is(user4.getName())))
+				  .andExpect(jsonPath("$.elements[0].email", is(user4.getEmail())));
+    }
+
     @Test
     public void testGetUsers_OrderByEmail() throws Exception {
     	

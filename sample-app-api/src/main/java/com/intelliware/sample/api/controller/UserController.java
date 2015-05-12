@@ -24,7 +24,7 @@ import com.intelliware.sample.vo.PageableListVO;
 import com.intelliware.sample.vo.UserVO;
 
 @RestController
-public class UserController {
+public class UserController implements IConstants {
 	
 	@Autowired
 	private UserRepository userDao;
@@ -37,8 +37,9 @@ public class UserController {
 		return userVOList;
 	}
 
-	private Sort getSort(String orderProperty) {
-		return orderProperty == null ? null : new Sort(Sort.Direction.ASC, orderProperty);
+	private Sort getSort(String orderProperty, boolean isAscending) {
+		Sort.Direction direction = isAscending ? Sort.Direction.ASC : Sort.Direction.DESC;
+		return orderProperty == null ? null : new Sort(direction, orderProperty);
 	}
 	
 	private User findUser(String id) throws UserNotFoundException {
@@ -72,8 +73,8 @@ public class UserController {
 		return new StringBuilder().append("%").append(nameToFilterBy).append("%").toString();
 	}
 	
-	public PageableListVO<UserVO> getUsersNotPaginated(String nameToFilterBy, String orderProperty){	
-		Sort sort = getSort(orderProperty);
+	public PageableListVO<UserVO> getUsersNotPaginated(String nameToFilterBy, String orderProperty, boolean isAscending){	
+		Sort sort = getSort(orderProperty, isAscending);
 		
 		Iterable<User> users = nameToFilterBy == null ? 
 				userDao.findAll(sort) : //sort can be null;
@@ -84,8 +85,8 @@ public class UserController {
 	}
 
 	
-	public PageableListVO<UserVO> getUsersPaginated(String nameToFilterBy, String orderProperty, Integer page, Integer pageSize){
-		Sort sort = getSort(orderProperty);
+	public PageableListVO<UserVO> getUsersPaginated(String nameToFilterBy, String orderProperty, boolean isAscending, Integer page, Integer pageSize){
+		Sort sort = getSort(orderProperty, isAscending);
 		PageRequest pageRequest = new PageRequest(page - 1, pageSize, sort); //subtract 1 because pageRequest is 0 based
 		
 		Page<User> users = nameToFilterBy == null ? 
@@ -98,21 +99,22 @@ public class UserController {
 	
 	@Transactional
 	@PreAuthorize("hasAnyRole('USER.CREATE', 'USER.EDIT', 'USER')")
-	@RequestMapping(value="/users", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+	@RequestMapping(value="/users", method=RequestMethod.GET, produces=IConstants.jsonUTF8)
 	public PageableListVO<UserVO> getUsers(@RequestParam(required = false, value="name") String nameToFilterBy,
 										   @RequestParam(required = false, value="_orderBy") String orderProperty,
 										   @RequestParam(required = false, value="_pageNumber") Integer page,
-										   @RequestParam(required = false, value="_pageSize") Integer pageSize) {
+										   @RequestParam(required = false, value="_pageSize") Integer pageSize,
+										   @RequestParam(required = false, value="_ascending", defaultValue = "true") boolean isAscending) {
 		if (page == null || pageSize == null){
-			return getUsersNotPaginated(nameToFilterBy, orderProperty);
+			return getUsersNotPaginated(nameToFilterBy, orderProperty, isAscending);
 		} else {
-			return getUsersPaginated(nameToFilterBy, orderProperty, page, pageSize);
+			return getUsersPaginated(nameToFilterBy, orderProperty, isAscending, page, pageSize);
 		}
 	}
 	
 	@Transactional
 	@PreAuthorize("hasAnyRole('USER.CREATE', 'USER.EDIT', 'USER')")
-	@RequestMapping(value="/users/{id}", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+	@RequestMapping(value="/users/{id}", method=RequestMethod.GET, produces=IConstants.jsonUTF8)
 	public UserVO getUser(@PathVariable String id) throws UserNotFoundException {		
 		User user = findUser(id);
 		return convertToUserVO(user);
@@ -120,7 +122,7 @@ public class UserController {
 	
 	@Transactional
 	@PreAuthorize("hasRole('USER.CREATE')")
-	@RequestMapping(value="/users", method=RequestMethod.POST, consumes="application/json;charset=UTF-8")
+	@RequestMapping(value="/users", method=RequestMethod.POST, consumes=IConstants.jsonUTF8)
 	@ResponseStatus(HttpStatus.CREATED)
 	public UserVO addUser(@RequestBody UserVO inputUser) {
 		User user = createUser(inputUser);
@@ -130,7 +132,7 @@ public class UserController {
 	
 	@Transactional
 	@PreAuthorize("hasAnyRole('USER.CREATE', 'USER.EDIT')")
-	@RequestMapping(value="/users/{id}", method=RequestMethod.PUT, consumes="application/json;charset=UTF-8")
+	@RequestMapping(value="/users/{id}", method=RequestMethod.PUT, consumes=IConstants.jsonUTF8)
 	public UserVO updateUser(@PathVariable String id, @RequestBody UserVO inputUser) throws UserNotFoundException{
 		User user = findUser(id);
 		setUserAttributes(inputUser, user);

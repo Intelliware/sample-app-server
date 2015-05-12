@@ -114,7 +114,11 @@ public class CompanyController implements IConstants{
 	
 	@Transactional
 	@PreAuthorize("hasRole('COMPANY.CREATE')")
+<<<<<<< HEAD
 	@RequestMapping(value="/companies", method=RequestMethod.POST, consumes="multipart/form-data")
+=======
+	@RequestMapping(value="/companies", method=RequestMethod.POST, consumes=IConstants.jsonUTF8)
+>>>>>>> master
 	@ResponseStatus(HttpStatus.CREATED)
 	public CompanyVO addCompany(@RequestParam(required=false, value="file") MultipartFile file, @RequestParam("data") String companyJsonStr) throws IOException {
 		CompanyVO inputCompany = fromJsonString(companyJsonStr, CompanyVO.class);
@@ -130,10 +134,15 @@ public class CompanyController implements IConstants{
 	
 	@Transactional
 	@PreAuthorize("hasAnyRole('COMPANY.CREATE', 'COMPANY.EDIT')")
+<<<<<<< HEAD
 	@RequestMapping(value="/companies/{id}", method=RequestMethod.PUT , consumes="multipart/form-data")
     public CompanyVO updateCompany(@PathVariable String id, @RequestParam(required=false, value="file") MultipartFile file, @RequestParam("data") String companyJsonStr) throws IOException {
 		CompanyVO inputCompany = fromJsonString(companyJsonStr, CompanyVO.class);
 		
+=======
+	@RequestMapping(value="/companies/{id}", method=RequestMethod.PUT, consumes=IConstants.jsonUTF8)
+	public CompanyVO updateCompany(@PathVariable String id, @RequestBody CompanyVO inputCompany) {
+>>>>>>> master
 		Company company = findCompany(id);
 		setCompanyAttributes(inputCompany, company);
 		companyDao.save(company);
