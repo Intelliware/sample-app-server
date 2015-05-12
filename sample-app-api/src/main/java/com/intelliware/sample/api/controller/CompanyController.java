@@ -94,7 +94,7 @@ public class CompanyController implements IConstants{
 
 	@Transactional
 	@PreAuthorize("hasAnyRole('COMPANY.CREATE', 'COMPANY.EDIT', 'COMPANY')")
-	@RequestMapping(value="/companies", method=RequestMethod.GET, produces=IConstants.jsonUTF8)
+	@RequestMapping(value="/companies", method=RequestMethod.GET, produces=JSON_UTF8)
 	public PageableListVO<CompanyVO> getCompanies() {
 		Iterable<Company> companies = companyDao.findAll();
 		List<CompanyVO> companyVOList = new ArrayList<CompanyVO>();
@@ -106,7 +106,7 @@ public class CompanyController implements IConstants{
 	
 	@Transactional
 	@PreAuthorize("hasAnyRole('COMPANY.CREATE', 'COMPANY.EDIT', 'COMPANY')")
-	@RequestMapping(value="/companies/{id}", method=RequestMethod.GET, produces=IConstants.jsonUTF8)
+	@RequestMapping(value="/companies/{id}", method=RequestMethod.GET, produces=JSON_UTF8)
 	public CompanyVO getCompany(@PathVariable String id) {
 		Company company = findCompany(id);
 		return convertToCompanyVO(company);
@@ -114,7 +114,7 @@ public class CompanyController implements IConstants{
 	
 	@Transactional
 	@PreAuthorize("hasRole('COMPANY.CREATE')")
-	@RequestMapping(value="/companies", method=RequestMethod.POST, consumes="multipart/form-data")
+	@RequestMapping(value="/companies", method=RequestMethod.POST, consumes=MULTIPART_FORM_DATA)
 	@ResponseStatus(HttpStatus.CREATED)
 	public CompanyVO addCompany(@RequestParam(required=false, value="file") MultipartFile file, @RequestParam("data") String companyJsonStr) throws IOException {
 		CompanyVO inputCompany = fromJsonString(companyJsonStr, CompanyVO.class);
@@ -130,7 +130,7 @@ public class CompanyController implements IConstants{
 	
 	@Transactional
 	@PreAuthorize("hasAnyRole('COMPANY.CREATE', 'COMPANY.EDIT')")
-	@RequestMapping(value="/companies/{id}", method=RequestMethod.PUT , consumes="multipart/form-data")
+	@RequestMapping(value="/companies/{id}", method=RequestMethod.PUT , consumes=MULTIPART_FORM_DATA)
     public CompanyVO updateCompany(@PathVariable String id, @RequestParam(required=false, value="file") MultipartFile file, @RequestParam("data") String companyJsonStr) throws IOException {
 		CompanyVO inputCompany = fromJsonString(companyJsonStr, CompanyVO.class);
 		
