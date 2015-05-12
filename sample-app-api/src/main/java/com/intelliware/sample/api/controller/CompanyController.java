@@ -1,7 +1,5 @@
 package com.intelliware.sample.api.controller;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,13 +42,13 @@ public class CompanyController implements IConstants{
 		return company;
 	}
 
-	private Company createCompany(CompanyVO inputCompany) {
+	private Company createCompany(CompanyVO inputCompany, MultipartFile file) throws IOException {
 		Company company = new Company();
-		setCompanyAttributes(inputCompany, company);
+		setCompanyAttributes(inputCompany, company, file);
 		return company;
 	}
 
-	private void setCompanyAttributes(CompanyVO companyVO, Company company) {
+	private void setCompanyAttributes(CompanyVO companyVO, Company company, MultipartFile file) throws IOException {
 		ContactVO contactVO = companyVO.getContact();
 		ContactNameVO contactNameVO = contactVO.getName();
 		company.setAddress(companyVO.getAddress());
@@ -60,6 +57,10 @@ public class CompanyController implements IConstants{
 		company.setContactEmail(contactVO.getEmail());
 		company.setContactFirstName(contactNameVO.getFirst());
 		company.setContactLastName(contactNameVO.getLast());
+		if (file != null && !file.isEmpty()) {
+			company.setImage(file.getBytes());
+		}
+
 	}
 	
 	private CompanyVO convertToCompanyVO(Company company) {	
@@ -75,6 +76,8 @@ public class CompanyController implements IConstants{
 		companyVO.setAddress(company.getAddress());
 		companyVO.setPhone(company.getPhone());
 		companyVO.setContact(contactVO);
+		companyVO.setImage(company.getImage());
+		
 		return companyVO;
 	}
 
@@ -119,10 +122,8 @@ public class CompanyController implements IConstants{
 	public CompanyVO addCompany(@RequestParam(required=false, value="file") MultipartFile file, @RequestParam("data") String companyJsonStr) throws IOException {
 		CompanyVO inputCompany = fromJsonString(companyJsonStr, CompanyVO.class);
 
-		Company company = createCompany(inputCompany);
+		Company company = createCompany(inputCompany, file);
 		companyDao.save(company);
-
-		saveFileOnDisk(file);
 
 		return convertToCompanyVO(company);
 	}
@@ -135,55 +136,13 @@ public class CompanyController implements IConstants{
 		CompanyVO inputCompany = fromJsonString(companyJsonStr, CompanyVO.class);
 		
 		Company company = findCompany(id);
-		setCompanyAttributes(inputCompany, company);
+		
+		setCompanyAttributes(inputCompany, company, file);
 		companyDao.save(company);
 
-		saveFileOnDisk(file);
-        
         return convertToCompanyVO(company);
 
     }
-
-	//TODO MZ/DJ this will be removed when we have the database model changes for the file.
-	private void saveFileOnDisk(MultipartFile file) throws IOException {
-
-		if (file != null && !file.isEmpty()) {
-
-			byte[] bytes = file.getBytes();
-			FileOutputStream fop = null;
-			File file1;
-
-			try {
-
-				file1 = new File("c:/temp/" + file.getName());
-				fop = new FileOutputStream(file1);
-
-				// if file doesnt exists, then create it
-				if (!file1.exists()) {
-					file1.createNewFile();
-				}
-
-				fop.write(bytes);
-				fop.flush();
-				fop.close();
-
-				System.out.println("Done");
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				try {
-					if (fop != null) {
-						fop.close();
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			System.out.println(String.format("receive %s, %d",
-					file.getOriginalFilename(), file.getBytes().length));
-		}
-	}
 	
 	
 	@Transactional

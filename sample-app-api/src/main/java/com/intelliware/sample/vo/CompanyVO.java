@@ -7,6 +7,7 @@ public class CompanyVO {
 	private String address;
 	private String phone;
 	private ContactVO contact;
+	private byte[] image;
 
 	public CompanyVO() {}
 
@@ -48,5 +49,13 @@ public class CompanyVO {
 
 	public void setContact(ContactVO contact) {
 		this.contact = contact;
+	}
+
+	public byte[] getImage() {
+		return image;
+	}
+
+	public void setImage(byte[] image) {
+		this.image = image;
 	}
 }

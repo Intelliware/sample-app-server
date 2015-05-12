@@ -13,11 +13,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.apache.commons.io.IOUtils;
+import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,6 +57,7 @@ public class CompanyControllerTest {
     private CompanyVO requestBody = TestUtils.createMyCompanyVO();
     private ContactVO requestContact = requestBody.getContact();
     private ContactNameVO requestContactName = requestContact.getName();
+    private String company1Image = null;
     
     @Autowired
     private CompanyRepository companyRepository;
@@ -77,7 +83,18 @@ public class CompanyControllerTest {
         company.setContactEmail("karyn.porter@stelaecor.com");
         company.setContactFirstName("Karyn");
         company.setContactLastName("Porter");
+
+        try(
+        	InputStream in = getClass().getClassLoader().getResourceAsStream("Penguins.jpg");
+        ) {
+        	company.setImage(IOUtils.toByteArray(in));
+        }
+        catch( IOException x) {
+        	throw x;
+        }
         companyList.add(companyRepository.save(company));
+        
+        company1Image = Base64.getEncoder().encodeToString( company.getImage());
         
         company = new Company();
         company.setName("BOILICON");
@@ -106,12 +123,14 @@ public class CompanyControllerTest {
         		  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(company1.getId()))))
         		  .andExpect(jsonPath("$.elements[0].name", is(company1.getName())))
         		  .andExpect(jsonPath("$.elements[0].phone", is(company1.getPhone())))
+        		  .andExpect(jsonPath("$.elements[0].image", is(company1Image)))
     		      .andExpect(jsonPath("$.elements[0].contact.email", is(company1.getContactEmail())))
     		      .andExpect(jsonPath("$.elements[0].contact.name.first", is(company1.getContactFirstName())))
         		  .andExpect(jsonPath("$.elements[0].contact.name.last", is(company1.getContactLastName())))
 				  .andExpect(jsonPath("$.elements[1].id", is(String.valueOf(company2.getId()))))
 				  .andExpect(jsonPath("$.elements[1].name", is(company2.getName())))
 				  .andExpect(jsonPath("$.elements[1].phone", is(company2.getPhone())))
+				  .andExpect(jsonPath("$.elements[1].image", IsNull.nullValue()))
 			      .andExpect(jsonPath("$.elements[1].contact.email", is(company2.getContactEmail())))
 			      .andExpect(jsonPath("$.elements[1].contact.name.first", is(company2.getContactFirstName())))
 				  .andExpect(jsonPath("$.elements[1].contact.name.last", is(company2.getContactLastName())));
@@ -133,6 +152,7 @@ public class CompanyControllerTest {
         		  .andExpect(jsonPath("$.name", is(company.getName())))
         		  .andExpect(jsonPath("$.address", is(company.getAddress())))
         		  .andExpect(jsonPath("$.phone", is(company.getPhone())))
+        		  .andExpect(jsonPath("$.image", is(company1Image)))
         		  .andExpect(jsonPath("$.contact.email", is(company.getContactEmail())))
         		  .andExpect(jsonPath("$.contact.name.first", is(company.getContactFirstName())))
         		  .andExpect(jsonPath("$.contact.name.last", is(company.getContactLastName())));
