@@ -37,8 +37,9 @@ public class UserController implements IConstants {
 		return userVOList;
 	}
 
-	private Sort getSort(String orderProperty) {
-		return orderProperty == null ? null : new Sort(Sort.Direction.ASC, orderProperty);
+	private Sort getSort(String orderProperty, boolean isAscending) {
+		Sort.Direction direction = isAscending ? Sort.Direction.ASC : Sort.Direction.DESC;
+		return orderProperty == null ? null : new Sort(direction, orderProperty);
 	}
 	
 	private User findUser(String id) throws UserNotFoundException {
@@ -72,8 +73,8 @@ public class UserController implements IConstants {
 		return new StringBuilder().append("%").append(nameToFilterBy).append("%").toString();
 	}
 	
-	public PageableListVO<UserVO> getUsersNotPaginated(String nameToFilterBy, String orderProperty){	
-		Sort sort = getSort(orderProperty);
+	public PageableListVO<UserVO> getUsersNotPaginated(String nameToFilterBy, String orderProperty, boolean isAscending){	
+		Sort sort = getSort(orderProperty, isAscending);
 		
 		Iterable<User> users = nameToFilterBy == null ? 
 				userDao.findAll(sort) : //sort can be null;
@@ -84,8 +85,8 @@ public class UserController implements IConstants {
 	}
 
 	
-	public PageableListVO<UserVO> getUsersPaginated(String nameToFilterBy, String orderProperty, Integer page, Integer pageSize){
-		Sort sort = getSort(orderProperty);
+	public PageableListVO<UserVO> getUsersPaginated(String nameToFilterBy, String orderProperty, boolean isAscending, Integer page, Integer pageSize){
+		Sort sort = getSort(orderProperty, isAscending);
 		PageRequest pageRequest = new PageRequest(page - 1, pageSize, sort); //subtract 1 because pageRequest is 0 based
 		
 		Page<User> users = nameToFilterBy == null ? 
@@ -102,11 +103,12 @@ public class UserController implements IConstants {
 	public PageableListVO<UserVO> getUsers(@RequestParam(required = false, value="name") String nameToFilterBy,
 										   @RequestParam(required = false, value="_orderBy") String orderProperty,
 										   @RequestParam(required = false, value="_pageNumber") Integer page,
-										   @RequestParam(required = false, value="_pageSize") Integer pageSize) {
+										   @RequestParam(required = false, value="_pageSize") Integer pageSize,
+										   @RequestParam(required = false, value="_ascending", defaultValue = "true") boolean isAscending) {
 		if (page == null || pageSize == null){
-			return getUsersNotPaginated(nameToFilterBy, orderProperty);
+			return getUsersNotPaginated(nameToFilterBy, orderProperty, isAscending);
 		} else {
-			return getUsersPaginated(nameToFilterBy, orderProperty, page, pageSize);
+			return getUsersPaginated(nameToFilterBy, orderProperty, isAscending, page, pageSize);
 		}
 	}
 	
