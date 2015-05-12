@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 @Entity
 public class Company {
@@ -17,7 +18,10 @@ public class Company {
 	private String contactEmail;
 	private String contactFirstName;
 	private String contactLastName;
-
+	
+	@Lob
+	private byte[] image;
+	
 	public Company() {}
 
 	public long getId() {
@@ -71,5 +75,13 @@ public class Company {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public byte[] getImage() {
+		return image;
+	}
+
+	public void setImage(byte[] image) {
+		this.image = image;
 	}
 }
