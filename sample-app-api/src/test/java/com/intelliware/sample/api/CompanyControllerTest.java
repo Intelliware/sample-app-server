@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -13,15 +14,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
-import org.apache.commons.io.IOUtils;
 import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,12 +27,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.intelliware.sample.api.dao.CompanyRepository;
 import com.intelliware.sample.api.model.Company;
@@ -49,6 +49,10 @@ import com.intelliware.sample.vo.ContactVO;
 @Transactional
 public class CompanyControllerTest {
 	
+	private static final byte[] SOME_BYTE_CONTENT = "some_byte_content".getBytes();
+	private static final byte[] SOME_OLD_BYTE_CONTENT = "some_old_byte_content".getBytes();
+	private static final MultipartFile MULTIPART_FILE = new MockMultipartFile("mock new image", SOME_BYTE_CONTENT);
+	
 	private MediaType contentType = TestUtils.getContentType();
 
     private MockMvc mockMvc;
@@ -57,7 +61,6 @@ public class CompanyControllerTest {
     private CompanyVO requestBody = TestUtils.createMyCompanyVO();
     private ContactVO requestContact = requestBody.getContact();
     private ContactNameVO requestContactName = requestContact.getName();
-    private String company1Image = null;
     
     @Autowired
     private CompanyRepository companyRepository;
@@ -82,19 +85,9 @@ public class CompanyControllerTest {
         company.setAddress("200 Adelaide W, Toronto, ON M5H 1W7");
         company.setContactEmail("karyn.porter@stelaecor.com");
         company.setContactFirstName("Karyn");
-        company.setContactLastName("Porter");
-
-        try(
-        	InputStream in = getClass().getClassLoader().getResourceAsStream("Penguins.jpg");
-        ) {
-        	company.setImage(IOUtils.toByteArray(in));
-        }
-        catch( IOException x) {
-        	throw x;
-        }
+        company.setContactLastName("Porter");     
+        company.setImage(SOME_OLD_BYTE_CONTENT);
         companyList.add(companyRepository.save(company));
-        
-        company1Image = Base64.getEncoder().encodeToString( company.getImage());
         
         company = new Company();
         company.setName("BOILICON");
@@ -123,7 +116,7 @@ public class CompanyControllerTest {
         		  .andExpect(jsonPath("$.elements[0].id", is(String.valueOf(company1.getId()))))
         		  .andExpect(jsonPath("$.elements[0].name", is(company1.getName())))
         		  .andExpect(jsonPath("$.elements[0].phone", is(company1.getPhone())))
-        		  .andExpect(jsonPath("$.elements[0].image", is(company1Image)))
+        		  .andExpect(jsonPath("$.elements[0].image", is(encodeToString(SOME_OLD_BYTE_CONTENT))))
     		      .andExpect(jsonPath("$.elements[0].contact.email", is(company1.getContactEmail())))
     		      .andExpect(jsonPath("$.elements[0].contact.name.first", is(company1.getContactFirstName())))
         		  .andExpect(jsonPath("$.elements[0].contact.name.last", is(company1.getContactLastName())))
@@ -152,7 +145,7 @@ public class CompanyControllerTest {
         		  .andExpect(jsonPath("$.name", is(company.getName())))
         		  .andExpect(jsonPath("$.address", is(company.getAddress())))
         		  .andExpect(jsonPath("$.phone", is(company.getPhone())))
-        		  .andExpect(jsonPath("$.image", is(company1Image)))
+        		  .andExpect(jsonPath("$.image", is(encodeToString(SOME_OLD_BYTE_CONTENT))))
         		  .andExpect(jsonPath("$.contact.email", is(company.getContactEmail())))
         		  .andExpect(jsonPath("$.contact.name.first", is(company.getContactFirstName())))
         		  .andExpect(jsonPath("$.contact.name.last", is(company.getContactLastName())));
@@ -190,6 +183,31 @@ public class CompanyControllerTest {
     }
     
     @Test
+    public void testAddCompanyWithFile() throws Exception {
+
+
+		mockMvc.perform(
+    			fileUpload("/companies")
+    			.file("file", MULTIPART_FILE.getBytes())
+    			.with(httpBasic("a","password"))
+    			.param("data", TestUtils.asJsonString(requestBody))
+    			.contentType(MediaType.MULTIPART_FORM_DATA)
+    			.accept(MediaType.APPLICATION_JSON)
+    			)
+    	  .andExpect(status().is(201))
+    	  .andExpect(jsonPath("$.id").exists())
+    	  .andExpect(jsonPath("$.name", is(requestBody.getName())))
+		  .andExpect(jsonPath("$.address", is(requestBody.getAddress())))
+		  .andExpect(jsonPath("$.phone", is(requestBody.getPhone())))
+		  .andExpect(jsonPath("$.image", is(encodeToString(SOME_BYTE_CONTENT))))
+		  .andExpect(jsonPath("$.contact.email", is(requestContact.getEmail())))
+		  .andExpect(jsonPath("$.contact.name.first", is(requestContactName.getFirst())))
+		  .andExpect(jsonPath("$.contact.name.last", is(requestContactName.getLast())));
+    	
+    	assertEquals(3, companyRepository.count());
+    }
+    
+	@Test
     public void testUpdateCompany() throws Exception {
     	
     	Company companyToUpdate = companyList.get(0);
@@ -251,4 +269,9 @@ public class CompanyControllerTest {
     			)
     			.andExpect(status().is(404));
     }
+    
+    private Object encodeToString(byte[] byteContent) {
+    	return Base64.getEncoder().encodeToString(byteContent);
+	}
+
 }
