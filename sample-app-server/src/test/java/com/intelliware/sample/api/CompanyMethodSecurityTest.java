@@ -32,7 +32,7 @@ import com.intelliware.sample.api.model.Company;
 import com.intelliware.sample.vo.CompanyVO;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SampleAppApiApplication.class)
+@SpringApplicationConfiguration(classes = SampleAppServerApplication.class)
 @WebAppConfiguration
 @TransactionConfiguration(transactionManager="transactionManager", defaultRollback=true)
 @Transactional

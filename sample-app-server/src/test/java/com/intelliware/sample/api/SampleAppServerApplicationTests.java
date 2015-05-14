@@ -10,11 +10,11 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SampleAppApiApplication.class)
+@SpringApplicationConfiguration(classes = SampleAppServerApplication.class)
 @WebAppConfiguration
 @TransactionConfiguration(transactionManager="transactionManager", defaultRollback=true)
 @Transactional
-public class SampleAppApiApplicationTests {
+public class SampleAppServerApplicationTests {
 
 	@Test
 	public void contextLoads() {

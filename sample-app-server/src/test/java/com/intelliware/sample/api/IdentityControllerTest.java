@@ -29,7 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SampleAppApiApplication.class)
+@SpringApplicationConfiguration(classes = SampleAppServerApplication.class)
 @WebAppConfiguration
 @TransactionConfiguration(transactionManager="transactionManager", defaultRollback=true)
 @Transactional
