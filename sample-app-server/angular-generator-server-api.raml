@@ -44,7 +44,8 @@ version: 1.0
                                   "email": "karyn.porter@stelaecor.com"
                                 },
                                 "name": "MARVAME",
-                                "phone": "+1 (828) 533-2655"
+                                "phone": "+1 (828) 533-2655",
+                                "image": --binary content
                               },
                               { "id": "2",
                                 "contact":
@@ -55,7 +56,8 @@ version: 1.0
                                   "email": "page.williamson@trollery.name"
                                 },
                                 "name": "BOILICON",
-                                "phone": "+1 (893) 432-3827"
+                                "phone": "+1 (893) 432-3827",
+                                "image": --binary content
                               }
                            ],
                 "_metadata": 
@@ -70,20 +72,28 @@ version: 1.0
   post:
     description: Create a new company.
     body:
-      application/json:
-        example: |
-          { 
-            "name": "Company name 3",
-            "address": "Address 3",
-            "phone": "Phone 3",
-            "contact": 
-                { "name":
-                    { "last": "Lastname 3",
-                      "first": "Firstname 3"
-                    },
-                  "email": "company3@gmail.com"
-                }
-          }
+      multipart/form-data:
+        formParameters:
+          file:
+            required: false
+            type: file
+            description: company image file
+          data:
+            required: true
+            type: string
+            example: |
+              { 
+                "name": "Company name 3",
+                "address": "Address 3",
+                "phone": "Phone 3",
+                "contact": 
+                    { "name":
+                        { "last": "Lastname 3",
+                          "first": "Firstname 3"
+                        },
+                      "email": "company3@gmail.com"
+                    }
+              }
     responses:
       201:
         body:
@@ -94,6 +104,7 @@ version: 1.0
                 "name": "Company name 3",
                 "address": "Address 3",
                 "phone": "Phone 3",
+                "image": --binary content,
                 "contact": 
                     { "name":
                         { "last": "Lastname 3",
@@ -116,6 +127,7 @@ version: 1.0
                   "name": "Company name 3",
                   "address": "Address 3",
                   "phone": "Phone 3",
+                  "image": --binary content,
                   "contact": 
                       { "name":
                           { "last": "Lastname 3",
@@ -137,20 +149,28 @@ version: 1.0
     put:
       description: Update an individual Company record
       body:
-        application/json:
-            example: |
-              { 
-                "name": "TALAE",
-                "address": "New address",
-                "phone": "+1 (816) 590-3053",
-                "contact": 
-                    { "name":
-                        { "first": "Joseph",
-                          "last": "Cherry"
-                        },
-                      "email": "joseph.cherry@venoflex.org"
-                    }
-              }
+        multipart/form-data:
+          formParameters:
+            file:
+              required: false
+              type: file
+              description: company image file
+            data:
+              required: true
+              type: string
+              example: |
+                { 
+                  "name": "TALAE",
+                  "address": "New address",
+                  "phone": "+1 (816) 590-3053",
+                  "contact": 
+                      { "name":
+                          { "first": "Joseph",
+                            "last": "Cherry"
+                          },
+                        "email": "joseph.cherry@venoflex.org"
+                      }
+                }
       responses:
         200:
           body:
@@ -161,6 +181,7 @@ version: 1.0
                     "name": "TALAE",
                     "address": "New address",
                     "phone": "+1 (816) 590-3053",
+                    "image": --binary content,
                     "contact": 
                         { "name":
                             { "first": "Joseph",
