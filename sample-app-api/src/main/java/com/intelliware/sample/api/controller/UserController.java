@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.intelliware.sample.api.dao.IDAOConstants;
 import com.intelliware.sample.api.dao.UserRepository;
 import com.intelliware.sample.api.model.User;
 import com.intelliware.sample.vo.PageableListVO;
@@ -115,8 +116,16 @@ public class UserController implements IConstants {
 	@Transactional
 	@PreAuthorize("hasAnyRole('USER.CREATE', 'USER.EDIT', 'USER')")
 	@RequestMapping(value="/users/{id}", method=RequestMethod.GET, produces=JSON_UTF8)
-	public UserVO getUser(@PathVariable String id) throws UserNotFoundException {		
-		User user = findUser(id);
+	public UserVO getUser(@PathVariable String id) throws UserNotFoundException {
+		User user = null;
+		
+		if (IDAOConstants.NEW_ENTITY_ID_STRING.equals(id)) {
+			user = new User();
+			user.setId(IDAOConstants.NEW_ENTITY_ID_LONG);			
+		} else {
+			user = findUser(id);			
+		}
+		
 		return convertToUserVO(user);
 	}
 	

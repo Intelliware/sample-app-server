@@ -33,6 +33,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.intelliware.sample.api.dao.IDAOConstants;
 import com.intelliware.sample.api.dao.UserRepository;
 import com.intelliware.sample.api.model.User;
 import com.intelliware.sample.vo.UserVO;
@@ -457,6 +458,17 @@ public class UserControllerTest {
         		  .andExpect(jsonPath("$.id", is(userId)))
         		  .andExpect(jsonPath("$.name", is(user.getName())))
         		  .andExpect(jsonPath("$.email", is(user.getEmail())));
+    }
+    
+    @Test
+    public void testGetUser_NewEntity() throws Exception {
+    	mockMvc.perform(
+    		get("/users/" + IDAOConstants.NEW_ENTITY_ID_STRING)
+    		.with(httpBasic("a", "password"))
+    	).andExpect(status().isOk())
+    	 .andExpect(jsonPath("$.id", is(IDAOConstants.NEW_ENTITY_ID_STRING)))
+    	 .andExpect(jsonPath("$.name", is((String)null)))
+    	 .andExpect(jsonPath("$.email", is((String)null)));
     }
     
     @Test
