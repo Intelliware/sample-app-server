@@ -11,9 +11,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EnableTransactionManagement(mode=AdviceMode.ASPECTJ)
-public class SampleAppApiApplication{
+public class SampleAppServerApplication{
 
     public static void main(String[] args) {
-        SpringApplication.run(SampleAppApiApplication.class, args);
+        SpringApplication.run(SampleAppServerApplication.class, args);
     }
 }

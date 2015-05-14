@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.intelliware</groupId>
-	<artifactId>sample-app-api</artifactId>
+	<artifactId>sample-app-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Sample App API</name>
+	<name>Sample App Server</name>
 	<description>RESTful server for Angular generator</description>
 
 	<parent>
@@ -20,7 +20,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<start-class>com.intelliware.sample.api.SampleAppApiApplication</start-class>
+		<start-class>com.intelliware.sample.api.SampleAppServerApplication</start-class>
 		<java.version>1.7</java.version>
 	</properties>
 
