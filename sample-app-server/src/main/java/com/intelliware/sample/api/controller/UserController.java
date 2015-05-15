@@ -78,7 +78,7 @@ public class UserController implements IConstants {
 		Sort sort = getSort(orderProperty, isAscending);
 		
 		Iterable<User> users = nameToFilterBy == null ? 
-				userDao.findAll(sort) : //sort can be null;
+				userDao.findAll(sort) : //sort can be null
 				userDao.findByNameLikeIgnoreCase(getFilterString(nameToFilterBy), sort);
 	
 		List<UserVO> userVOList = convertToUserVOList(users);
