@@ -1,5 +1,7 @@
 package com.intelliware.sample.api.model;
 
+import java.util.Arrays;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -78,7 +80,7 @@ public class Company {
 	}
 
 	public byte[] getImage() {
-		return image;
+		return (image == null ? null : Arrays.copyOf(image, image.length));
 	}
 
 	public void setImage(byte[] image) {

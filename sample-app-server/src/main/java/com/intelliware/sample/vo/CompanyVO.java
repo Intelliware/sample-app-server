@@ -1,5 +1,7 @@
 package com.intelliware.sample.vo;
 
+import java.util.Arrays;
+
 public class CompanyVO {
 	
 	private String id;
@@ -52,7 +54,7 @@ public class CompanyVO {
 	}
 
 	public byte[] getImage() {
-		return image;
+		return (image == null ? null : Arrays.copyOf(image, image.length));
 	}
 
 	public void setImage(byte[] image) {
