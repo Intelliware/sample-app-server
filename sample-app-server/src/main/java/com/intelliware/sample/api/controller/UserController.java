@@ -76,10 +76,14 @@ public class UserController implements IConstants {
 	
 	public PageableListVO<UserVO> getUsersNotPaginated(String nameToFilterBy, String orderProperty, boolean isAscending){	
 		Sort sort = getSort(orderProperty, isAscending);
+		Iterable<User> users;
 		
-		Iterable<User> users = nameToFilterBy == null ? 
-				userDao.findAll(sort) : //sort can be null
-				userDao.findByNameLikeIgnoreCase(getFilterString(nameToFilterBy), sort);
+		 if (nameToFilterBy == null){
+			 //sort can be null
+			 users = userDao.findAll(sort);
+		 } else {
+			 users = userDao.findByNameLikeIgnoreCase(getFilterString(nameToFilterBy), sort);
+		 }
 	
 		List<UserVO> userVOList = convertToUserVOList(users);
 		return new PageableListVO<UserVO>(userVOList);
@@ -88,7 +92,9 @@ public class UserController implements IConstants {
 	
 	public PageableListVO<UserVO> getUsersPaginated(String nameToFilterBy, String orderProperty, boolean isAscending, Integer page, Integer pageSize){
 		Sort sort = getSort(orderProperty, isAscending);
-		PageRequest pageRequest = new PageRequest(page - 1, pageSize, sort); //subtract 1 because pageRequest is 0 based
+		
+		//subtract 1 because pageRequest is 0 based
+		PageRequest pageRequest = new PageRequest(page - 1, pageSize, sort);
 		
 		Page<User> users = nameToFilterBy == null ? 
 				userDao.findAll(pageRequest) :
