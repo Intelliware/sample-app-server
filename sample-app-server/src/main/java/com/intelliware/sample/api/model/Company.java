@@ -82,6 +82,6 @@ public class Company {
 	}
 
 	public void setImage(byte[] image) {
-		this.image = image.clone();
+		this.image = (image == null ? null : image.clone());
 	}
 }

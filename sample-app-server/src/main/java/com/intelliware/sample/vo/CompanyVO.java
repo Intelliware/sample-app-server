@@ -56,6 +56,6 @@ public class CompanyVO {
 	}
 
 	public void setImage(byte[] image) {
-		this.image = image;
+		this.image = (image == null ? null : image.clone());
 	}
 }
